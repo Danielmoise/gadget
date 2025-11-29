@@ -1,5 +1,4 @@
 
-
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { ProductDetails, GeneratedContent, FormFieldConfig, Testimonial, UiTranslation } from "../types";
 
@@ -34,8 +33,8 @@ const getLegalTranslation = (lang: string): string => {
         'Polacco': "Nasza strona internetowa działa wyłącznie jako partner i koncentruje się na promowaniu produktów poprzez kampanie reklamowe. Nie ponosimy żadnej odpowiedzialności za wysyłkę, jakość ani żadne inne kwestie dotyczące produktów sprzedawanych za pośrednictwem linków partnerskich. Należy pamiętać, że zdjęcia użyte w celach ilustracyjnych mogą nie odpowiadać rzeczywistemu wizerunkowi zakupionego produktu. Zapraszamy do kontaktu z obsługą klienta po wprowadzeniu danych w formularzu w celu zadania pytań lub uzyskania informacji o produkcie przed potwierdzeniem zamówienia. Informujemy również, że bezpłatne produkty oferowane na stronie mogą być objęte ograniczoną dostępnością, bez żadnej gwarancji dostępności ze strony sprzedawcy wysyłającego produkt. Pamiętaj, że w przypadku problemów związanych z przesyłkami lub jakością produktów odpowiedzialność spoczywa bezpośrednio na firmie dostarczającej.",
         'Rumeno': "Site-ul nostru acționează exclusiv ca afiliat și se concentrează pe promovarea produselor prin campanii publicitare. Nu ne asumăm nicio responsabilitate pentru transport, calitate sau orice altă problemă privind produsele vândute prin link-uri de afiliere. Vă rugăm să rețineți că imaginile utilizate în scop ilustrativ pot să nu corespundă cu imaginea reală a produsului achiziționat. Vă invităm să contactați serviciul de asistență clienți după introducerea datelor în formular pentru a pune orice întrebare sau informație despre produs înainte de a confirma comanda. Vă informăm, de asemenea, că produsele gratuite oferite pe site pot fi supuse unei disponibilități limitate, fără nicio garanție de disponibilitate din partea vânzătorului care expediază produsul. Rețineți că, în cazul în care apar probleme legate de expedieri sau de calitatea produselor, responsabilitatea revine direct companiei furnizoare.",
         'Svedese': "Vår webbplats fungerar uteslutande som en affiliate och fokuserar på att marknadsföra produkter genom reklamkampanjer. Vi tar inget ansvar för frakt, kvalitet eller någon annan fråga gällande produkter som säljs via affiliatelänkar. Observera att bilder som används i illustrativt syfte kanske inte motsvarar den faktiska bilden av den köpta produkten. Vi inbjuder dig att kontakta kundtjänst efter att ha angett dina uppgifter i formuläret för att ställa frågor eller få information om produkten innan du bekräftar beställningen. Vi informerar dig också om att gratisprodukter som erbjuds på webbplatsen kan vara föremål för begränsad tillgänglighet, utan någon garanti för tillgänglighet från säljaren som skickar produkten. Kom ihåg att om problem uppstår gällande leveranser eller produktkvalitet ligger ansvaret direkt på det levererande företaget.",
-        'Bulgaro': "Нашият уебсайт действа изключително като партньор и се фокусира върху популяризирането на продукти чрез рекламни кампании. Не поемаме отговорност за доставка, качество или какъвто и да е друг въпрос относно продукти, продавани чрез партньорски връзки. Моля, имайте предвид, че изображенията, използвани с илюстративна цел, може да не съответстват на действителното изображение на закупения продукт. Каним ви да се свържете с обслужването на клиенти, след като въведете данните си във формуляра, за да зададете всякакви въпроси или информация за продукта, преди да потвърдите поръчката. Също така ви информираме, че безплатните продукти, предлагани на сайта, може да са с ограничена наличност, без никаква гаранция за наличност от продавача, изпращащ продукта. Не забравяйте, че ако възникнат проблеми, свързани с пратките или качеството на продуктите, отговорността е директно на фирмата доставчик.",
-        'Greco': "Ο ιστότοπός μας λειτουργεί αποκλειστικά ως συνεργάτης και επικεντρώνεται στην προώθηση προϊόντων μέσω διαφημιστικών εκστρατειών. Δεν αναλαμβάνουμε καμία ευθύνη για την αποστολή, την ποιότητα ή οποιοδήποτε άλλο ζήτηма σχετικά με προϊόντα που πωλούνται μέσω συνδέσμων συνεργατών. Λάβετε υπόψη ότι οι εικόνες που χρησιμοποιούνται για επεξηγηματικούς σκοπούς ενδέχεται να μην αντιστοιχούν στην πραγματική εικόνα του προϊόντος που αγοράσατε. Σας προσκαλούμε να επικοινωνήσετε με την εξυπηρέτηση πελατών αφού εισαγάγετε τα στοιχεία σας στη φόρμα για να κάνετε οποιεσδήποτε ερωτήσεις ή πληροφορίες σχετικά με το προϊόν πριν επιβεβαιώσετε την παραγγελία. Σας ενημερώνουμε επίσης ότι τα δωρεάν προϊόντα που προσφέρονται στον ιστότοπο ενδέχεται να υπόκεινται σε περιορισμένη διαθεσιμότητα, χωρίς καμία εγγύηση διαθεσιμότητας από τον πωλητή που αποστέλλει το προϊόν. Να θυμάστε ότι εάν προκύψουν προβλήματα σχετικά με τις αποστοлές ή την ποιότητα των προϊόντων, η ευθύνη βαρύνει άμεσα την προμηθεύτρια εταιρεία.",
+        'Bulgaro': "Нашият уебсайт действа изключително като партньор и се фокусира върху популяризирането на продукти чрез рекламни кампании. Не поемаме отговорност за доставка, качество или какъвто и да е друг въпрос относно продукти, продавани чрез партньorски връзки. Моля, имайте предвид, че изображенията, използвани с илюстративна цел, може да не съответстват на действителното изображение на закупения продукт. Каним ви да се свържете с обслужването на клиенти, след като въведете данните си във формуляра, за да зададете всякакви въпроси или информация за продукта, преди да потвърдите поръчката. Също така ви информираме, че безплатните продукти, предлагани на сайта, може да са с ограничена наличност, без никаква гаранция за наличност от продавача, изпращащ продукта. Не забравяйте, че ако възникнат проблеми, свързани с пратките или качеството на продуктите, отговорността е директно на фирмата доставчик.",
+        'Greco': "Ο ιστότοπός μας λειτουργεί αποκλειστικά ως συνεργάτης και επικεντρώνεται στην προώθηση προϊόντων μέσω διαφημιστικών εκστρατειών. Δεν αναλαμβάνουμε καμία ευθύνη για την αποστολή, την ποιότητα ή οποιοδήποτε άλλο ζήτημα σχετικά με προϊόντα που πωλούνται μέσω συνδέσμων συνεργατών. Λάβετε υπόψη ότι οι εικόνες που χρησιμοποιούνται για επεξηγηματικούς σκοπούς ενδέχεται να μην αντιστοιχούν στην πραγματική εικόνα του προϊόντος που αγοράσατε. Σας προσκαλούμε να επικοινωνήσετε με την εξυπηρέτηση πελατών αφού εισαγάγετε τα στοιχεία σας στη φόρμα για να κάνετε οποιεσδήποτε ερωτήσεις ή πληροφορίες σχετικά με το προϊόν πριν επιβεβαιώσετε την παραγγελία. Σας ενημερώνουμε επίσης ότι τα δωρεάν προϊόντα που προσφέρονται στον ιστότοπο ενδέχεται να υπόκεινται σε περιορισμένη διαθεσιμότητα, χωρίς καμία εγγύηση διαθεσιμότητας από τον πωλητή που αποστέλλει το προϊόν. Να θυμάστε ότι εάν προκύψουν προβλήματα σχετικά με τις αποστολές ή την ποιότητα των προϊόντων, η ευθύνη βαρύνει άμεσα την προμηθεύτρια εταιρεία.",
         'Ungherese': "Weboldalunk kizárólag partnerként működik, és a termékek reklámkampányokon keresztül történő népszerűsítésére összpontosít. Nem vállalunk felelősséget a szállításért, a minőségért vagy a partnerlinkeken keresztül értékesített termékekkel kapcsolatos bármely más kérdésért. Felhívjuk figyelmét, hogy az illusztrációs célokra használt képek nem feltétlenül felelnek meg a megvásárolt termék tényleges képének. Kérjük, vegye fel a kapcsolatot az ügyfélszolgálattal, miután megadta adatait az űrlapon, hogy bármilyen kérdést vagy információt feltegyen a termékkel kapcsolatban a megrendelés megerősítése előtt. Tájékoztatjuk továbbá, hogy az oldalon kínált ingyenes termékek korlátozottan állhatnak rendelkezésre, a terméket szállító eladó rendelkezésre állási garanciája nélkül. Ne feledje, hogy amennyiben a szállítással vagy a termékminőséggel kapcsolatban problémák merülnek fel, a felelősség közvetlenül a szállító céget terheli.",
         'Croato': "Naša web stranica djeluje isključivo kao partner i usredotočena je na promociju proizvoda putem reklamnih kampanja. Ne preuzimamo nikakvu odgovornost za otpremu, kvalitetu ili bilo koje drugo pitanje u vezi s proizvodima koji se prodaju putem partnerskih veza. Imajte na umu da slike koje se koriste u ilustrativne svrhe možda ne odgovaraju stvarnoj slici kupljenog proizvoda. Pozivamo vas da kontaktirate korisničku podršku nakon unosa podataka u obrazac kako biste postavili bilo kakva pitanja ili informacije o proizvodu prije potvrde narudžbe. Također vas obavještavamo da besplatni proizvodi ponuđeni na web mjestu mogu biti podložni ograničenoj dostupnosti, bez ikakvog jamstva dostupnosti od strane prodavatelja koji šalje proizvod. Imajte na umu da ako se pojave problemi u vezi s pošiljkama ili kvalitetom proizvoda, odgovornost leži izravno na tvrtki dobavljaču.",
         'Serbo': "Naša veb stranica deluje isključivo kao partner i fokusira se na promociju proizvoda putem reklamnih kampanja. Ne preuzimamo nikakvu odgovornost za otpremu, kvalitet ili bilo koje drugo pitanje u vezi sa proizvodima koji se prodaju putem partnerskih veza. Imajte na umu da slike koje se koriste u ilustrativne svrhe možda ne odgovaraju stvarnoj slici kupljenog proizvoda. Pozivamo vas da kontaktirate korisničku podršku nakon unosa podataka u obrazac kako biste postavili bilo kakva pitanja ili informacije o proizvodu pre potvrde porudžbine. Takođe vas obaveštavamo da besplatni proizvodi ponuđeni na sajtu mogu biti podložni ograničenoj dostupnosti, bez ikakve garancije dostupnosti od strane prodavca koji šalje proizvod. Imajte na umu da ako se pojave problemi u vezi sa pošiljkama ili kvalitetom proizvoda, odgovornost leži direktno na kompaniji dobavljaču.",
@@ -191,28 +190,16 @@ const getRandomHistoricalDate = (language: string = 'Italiano'): string => {
 
 // HELPER TO PROCESS IMAGE FOR GEMINI (COMPRESS & NORMALIZE)
 const processImageForGemini = async (input: string): Promise<{ mimeType: string, data: string }> => {
+    // This function now ONLY processes base64 strings to avoid CORS issues.
+    if (!input.startsWith('data:')) {
+        throw new Error("Cannot process remote URLs. Only uploaded images are supported for AI generation.");
+    }
+    
     let base64String = input;
 
-    // 1. If it's a URL, fetch it
-    if (input.startsWith('http')) {
-        try {
-            const response = await fetch(input);
-            const blob = await response.blob();
-            base64String = await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result as string);
-                reader.readAsDataURL(blob);
-            });
-        } catch (e) {
-            console.error("Failed to fetch image from URL", e);
-            throw new Error("Impossible to process image URL");
-        }
-    }
-
-    // 2. Compress/Resize (Crucial for avoiding 400 errors with large inputs)
+    // Compress/Resize (Crucial for avoiding 400 errors with large inputs)
     return new Promise((resolve, reject) => {
         const img = new Image();
-        img.crossOrigin = "Anonymous"; // Essential for canvas with external URLs
         img.onload = () => {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -287,8 +274,10 @@ export const generateLandingPage = async (product: ProductDetails, reviewCount: 
 
   const parts: any[] = [{ text: textPrompt }];
 
-  const imagesToProcess = product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []);
-  // Use robust processing to avoid 400 errors during generation too
+  // FIX: Only process uploaded (base64) images to avoid CORS errors. URLs are for display only.
+  const imagesToProcess = (product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []))
+    .filter(img => img && img.startsWith('data:'));
+  
   for (const imgData of imagesToProcess) {
       if(imgData) {
         try {
@@ -491,7 +480,8 @@ export const generateActionImages = async (product: ProductDetails, count: numbe
   if (!ai) return [];
   
   const baseImage = product.images?.[0] || product.image;
-  if (!baseImage) return [];
+  // FIX: Do not process remote URLs, as it will fail due to CORS. Only uploaded (base64) images are supported.
+  if (!baseImage || baseImage.startsWith('http')) return [];
 
   const results: string[] = [];
   const modelId = 'gemini-2.5-flash-image';

@@ -106,11 +106,11 @@ const LiveMapModal = ({ isOpen, onClose, users }: { isOpen: boolean, onClose: ()
         const timer = setTimeout(() => {
             if (mapRef.current && !mapInstance.current && window.L) {
                 mapInstance.current = window.L.map(mapRef.current).setView([20, 0], 2);
-                window.L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>', subdomains: 'abcd', maxZoom: 19 }).addTo(mapInstance.current);
+                window.L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>', subdomains: 'abcd', maxZoom: 19 }).addTo(mapInstance.current);
             }
             if (mapInstance.current) {
                 mapInstance.current.eachLayer((layer: any) => { if (!layer._url) mapInstance.current.removeLayer(layer); });
-                users.forEach(user => { if (user.lat && user.lon) { window.L.circleMarker([user.lat, user.lon], { radius: 6, fillColor: "#10b981", color: "#fff", weight: 2, opacity: 1, fillOpacity: 0.8 }).addTo(mapInstance.current).bindPopup(`<b>${user.city || 'Sconosciuto'}, ${user.country || 'N/A'}</b><br>IP: ${user.ip || 'Hidden'}`); } });
+                users.forEach(user => { if (user.lat && user.lon) { window.L.circleMarker([user.lat, user.lon], { radius: 6, fillColor: "#10b981", color: "#333", weight: 2, opacity: 1, fillOpacity: 0.8 }).addTo(mapInstance.current).bindPopup(`<b>${user.city || 'Sconosciuto'}, ${user.country || 'N/A'}</b><br>IP: ${user.ip || 'Hidden'}`); } });
             }
         }, 100);
         return () => clearTimeout(timer);
@@ -119,14 +119,14 @@ const LiveMapModal = ({ isOpen, onClose, users }: { isOpen: boolean, onClose: ()
     if (!isOpen) return null;
     return (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose}></div>
-            <div className="relative bg-slate-900 rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden border border-slate-700 animate-in zoom-in duration-200">
-                <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-950">
-                    <div className="flex items-center gap-2"><Globe className="w-5 h-5 text-emerald-400" /><h3 className="font-bold text-white">Mappa Utenti Live</h3><span className="bg-emerald-900/50 text-emerald-400 text-xs px-2 py-0.5 rounded-full border border-emerald-500/20">{users.length} Online</span></div>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-full text-slate-400 hover:text-white transition"><X className="w-5 h-5"/></button>
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden border border-gray-200 animate-in zoom-in duration-200">
+                <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+                    <div className="flex items-center gap-2"><Globe className="w-5 h-5 text-emerald-500" /><h3 className="font-bold text-slate-800">Mappa Utenti Live</h3><span className="bg-emerald-100 text-emerald-800 text-xs px-2 py-0.5 rounded-full border border-emerald-200">{users.length} Online</span></div>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full text-slate-500 hover:text-slate-800 transition"><X className="w-5 h-5"/></button>
                 </div>
-                <div className="relative h-[60vh] w-full bg-slate-900"><div ref={mapRef} id="map" className="w-full h-full z-10"></div></div>
-                <div className="p-3 bg-slate-950 text-xs text-slate-500 text-center border-t border-slate-800">Posizioni approssimative basate su indirizzo IP.</div>
+                <div className="relative h-[60vh] w-full bg-gray-100"><div ref={mapRef} id="map" className="w-full h-full z-10"></div></div>
+                <div className="p-3 bg-gray-50 text-xs text-slate-500 text-center border-t border-gray-200">Posizioni approssimative basate su indirizzo IP.</div>
             </div>
         </div>
     );
@@ -197,6 +197,45 @@ const createDefaultThankYouContent = (landingContent: GeneratedContent): Generat
     };
 };
 
+const ImagePickerModal = ({ isOpen, onClose, images, onSelect }: { 
+    isOpen: boolean; 
+    onClose: () => void; 
+    images: string[]; 
+    onSelect: (image: string) => void; 
+}) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-[1001] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose}></div>
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300 flex flex-col max-h-[80vh]">
+                <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h3 className="font-bold text-lg text-slate-900">Scegli un'immagine dalla galleria</h3>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full"><X className="w-5 h-5"/></button>
+                </div>
+                <div className="p-6 overflow-y-auto">
+                    {images.length > 0 ? (
+                        <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+                            {images.map((img, idx) => (
+                                <button 
+                                    key={idx} 
+                                    onClick={() => onSelect(img)}
+                                    className="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-transparent hover:border-emerald-500 hover:ring-2 hover:ring-emerald-500 transition"
+                                >
+                                    <img src={img} alt={`Gallery image ${idx+1}`} className="w-full h-full object-cover" />
+                                </button>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-center text-slate-500 py-10">Nessuna immagine nella galleria. Aggiungine una prima!</p>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
 const App: React.FC = () => {
   const [view, setView] = useState<'home' | 'product_view' | 'thank_you_view' | 'admin' | 'preview'>('home');
   const [adminSection, setAdminSection] = useState<'pages' | 'settings'>('pages');
@@ -225,6 +264,8 @@ const App: React.FC = () => {
   const [genBeforeAfter, setGenBeforeAfter] = useState(false);
   const [genHumanUse, setGenHumanUse] = useState(false);
   const [customImagePrompt, setCustomImagePrompt] = useState('');
+  const [imageUrl, setImageUrl] = useState(''); // State for URL input
+  const [galleryImageUrl, setGalleryImageUrl] = useState(''); // State for gallery URL input
 
   const [reviewCount, setReviewCount] = useState<number>(10);
   const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
@@ -256,6 +297,8 @@ const App: React.FC = () => {
   const [isLoadingPages, setIsLoadingPages] = useState(true);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [isMapOpen, setIsMapOpen] = useState(false);
+  const [imagePicker, setImagePicker] = useState<{ isOpen: boolean; type: 'feature' | 'testimonial' | 'box' | 'thankyou'; index: number | null }>({ isOpen: false, type: 'feature', index: null });
+
 
   const fetchPublicPages = useCallback(async () => {
     if (!supabase) return;
@@ -421,6 +464,15 @@ const App: React.FC = () => {
   const handleLogout = async () => { if (isSupabaseConfigured() && supabase) await supabase.auth.signOut(); setSession(null); setView('home'); };
   const handleStealthClick = () => { const now = Date.now(); if (now - lastClickTime < 1000) { const newCount = stealthCount + 1; setStealthCount(newCount); if (newCount >= 3) { setIsLoginOpen(true); setStealthCount(0); } } else { setStealthCount(1); } setLastClickTime(now); };
 
+  const handleAddImageUrl = (url: string) => {
+    if (!url.startsWith('http')) {
+        alert("Per favore, inserisci un URL valido (http o https).");
+        return;
+    }
+    setProduct(prev => ({ ...prev, images: [...(prev.images || []), url], image: (prev.images || []).length === 0 ? url : prev.image }));
+    setImageUrl('');
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, forThankYouPage: boolean = false) => {
     const files = e.target.files;
     if (files && files.length > 0) {
@@ -439,6 +491,19 @@ const App: React.FC = () => {
       const files = e.target.files;
       if (files && files.length > 0) { const fileList = Array.from(files) as File[]; fileList.forEach(file => { if (file.size > 4 * 1024 * 1024) return; const reader = new FileReader(); reader.onloadend = () => { if (reader.result) { setGeneratedContent(prev => { if (!prev) return null; const existing = prev.generatedImages || []; if (!existing.includes(reader.result as string)) { return { ...prev, generatedImages: [...existing, reader.result as string] }; } return prev; }); } }; reader.readAsDataURL(file); }); }
       if (galleryInputRef.current) galleryInputRef.current.value = '';
+  };
+  
+  const addGalleryImageUrl = (url: string) => {
+      if (generatedContent && url.startsWith('http')) {
+          setGeneratedContent(prev => {
+              if (!prev) return null;
+              const existing = prev.generatedImages || [];
+              if (!existing.includes(url)) {
+                  return { ...prev, generatedImages: [...existing, url] };
+              }
+              return prev;
+          });
+      }
   };
 
   const handleReviewImageUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -587,8 +652,22 @@ const App: React.FC = () => {
   };
 
   const uploadImageToStorage = async (imageString: string): Promise<string> => {
-      if (!supabase || !imageString.startsWith('data:')) return imageString;
-      try { const blob = base64ToBlob(imageString); if (!blob) return imageString; const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.png`; const { data, error } = await supabase.storage.from('landing-images').upload(fileName, blob, { contentType: blob.type || 'image/png', upsert: false }); if (error) { console.error("Upload error:", error); return imageString; } const { data: publicData } = supabase.storage.from('landing-images').getPublicUrl(fileName); return publicData.publicUrl; } catch (e) { console.error("Exception uploading image:", e); return imageString; }
+      if (!supabase || !imageString || !imageString.startsWith('data:')) return imageString; // Don't upload if it's not a base64 string
+      try { 
+          const blob = base64ToBlob(imageString); 
+          if (!blob) return imageString; 
+          const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.png`; 
+          const { data, error } = await supabase.storage.from('landing-images').upload(fileName, blob, { contentType: blob.type || 'image/png', upsert: false }); 
+          if (error) { 
+              console.error("Upload error:", error); 
+              return imageString; 
+          } 
+          const { data: publicData } = supabase.storage.from('landing-images').getPublicUrl(fileName); 
+          return publicData.publicUrl; 
+      } catch (e) { 
+          console.error("Exception uploading image:", e); 
+          return imageString; 
+      }
   };
 
   const handleSaveToDb = async () => {
@@ -717,27 +796,44 @@ const App: React.FC = () => {
 
   if (view === 'admin' && session) {
     return (
-      <div className="min-h-screen bg-slate-900 text-slate-200 font-sans">
+      <div className="min-h-screen bg-gray-100 text-slate-800 font-sans">
         <LiveMapModal isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} users={onlineUsers} />
-        <nav className="border-b border-slate-800 bg-slate-950 p-4 sticky top-0 z-40">
+         <ImagePickerModal 
+            isOpen={imagePicker.isOpen}
+            onClose={() => setImagePicker({ isOpen: false, type: 'feature', index: null })}
+            images={generatedContent?.generatedImages || []}
+            onSelect={(image) => {
+                if (imagePicker.type === 'feature' && imagePicker.index !== null) {
+                    updateFeature(imagePicker.index, 'image', image);
+                } else if (imagePicker.type === 'testimonial' && imagePicker.index !== null) {
+                    updateTestimonial(imagePicker.index, 'image', image);
+                } else if (imagePicker.type === 'box') {
+                    updateBoxContent('image', image);
+                } else if (imagePicker.type === 'thankyou') {
+                    updateContentField('heroImageBase64', image);
+                }
+                setImagePicker({ isOpen: false, type: 'feature', index: null });
+            }}
+        />
+        <nav className="border-b border-gray-200 bg-white p-4 sticky top-0 z-40">
           <div className="container mx-auto flex justify-between items-center">
             <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2 text-emerald-400 font-bold text-xl"><Sparkles className="w-6 h-6" /><span>Agdid Admin</span></div>
+                <div className="flex items-center gap-2 text-emerald-600 font-bold text-xl"><Sparkles className="w-6 h-6" /><span>Agdid Admin</span></div>
                 
-                <div className="hidden md:flex gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800"><button onClick={() => setAdminSection('pages')} className={`px-3 py-1.5 rounded text-xs font-bold transition ${adminSection === 'pages' ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-white'}`}>Generatore</button><button onClick={() => setAdminSection('settings')} className={`px-3 py-1.5 rounded text-xs font-bold transition ${adminSection === 'settings' ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-white'}`}>Impostazioni Sito</button></div>
+                <div className="hidden md:flex gap-1 bg-gray-200 p-1 rounded-lg border border-gray-300"><button onClick={() => setAdminSection('pages')} className={`px-3 py-1.5 rounded text-xs font-bold transition ${adminSection === 'pages' ? 'bg-white text-emerald-700 shadow' : 'text-slate-500 hover:text-slate-900'}`}>Generatore</button><button onClick={() => setAdminSection('settings')} className={`px-3 py-1.5 rounded text-xs font-bold transition ${adminSection === 'settings' ? 'bg-white text-emerald-700 shadow' : 'text-slate-500 hover:text-slate-900'}`}>Impostazioni Sito</button></div>
             </div>
             <div className="flex items-center gap-4">
                 <button
                     onClick={() => setIsMapOpen(true)}
-                    className="flex items-center gap-2 text-sm text-emerald-400 hover:text-white transition-colors font-semibold py-1 px-3 rounded-full bg-slate-800 border border-slate-700"
+                    className="flex items-center gap-2 text-sm text-emerald-600 hover:text-emerald-700 transition-colors font-semibold py-1 px-3 rounded-full bg-white border border-gray-200 hover:bg-gray-100 shadow-sm"
                 >
                     <span className="relative flex h-2.5 w-2.5">
                         {onlineUsers.length > 0 && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>}
-                        <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${onlineUsers.length > 0 ? 'bg-emerald-500' : 'bg-slate-600'}`}></span>
+                        <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${onlineUsers.length > 0 ? 'bg-emerald-500' : 'bg-slate-400'}`}></span>
                     </span>
                     <span>{onlineUsers.length} Live</span>
                 </button>
-                <button onClick={() => setView('home')} className="text-sm text-slate-400 hover:text-white mr-4">Vedi Sito Pubblico</button><span className="text-xs bg-slate-800 px-2 py-1 rounded text-slate-500 hidden sm:block">{session.email}</span><button onClick={handleLogout} className="p-2 hover:bg-slate-800 rounded-lg transition text-slate-400 hover:text-white"><LogOut className="w-5 h-5" /></button>
+                <button onClick={() => setView('home')} className="text-sm text-slate-500 hover:text-slate-900 mr-4">Vedi Sito Pubblico</button><span className="text-xs bg-gray-100 px-2 py-1 rounded text-slate-600 hidden sm:block">{session.email}</span><button onClick={handleLogout} className="p-2 hover:bg-gray-200 rounded-lg transition text-slate-500 hover:text-slate-900"><LogOut className="w-5 h-5" /></button>
             </div>
           </div>
         </nav>
@@ -745,11 +841,11 @@ const App: React.FC = () => {
             {adminSection === 'settings' ? (
                 // ... (Settings view) ...
                 <div className="max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4">
-                    <div className="flex items-center gap-3 mb-8"><div className="bg-slate-800 p-3 rounded-xl"><Settings className="w-8 h-8 text-emerald-400" /></div><div><h1 className="text-2xl font-bold text-white">Impostazioni Globali Sito</h1><p className="text-slate-400">Personalizza il nome del sito e i testi del footer.</p></div></div>
-                    <div className="bg-slate-800 rounded-2xl border border-slate-700 p-8 shadow-2xl space-y-6">
-                        <div><label className="block text-sm font-bold text-slate-300 mb-2">Nome del Sito</label><input type="text" value={siteConfig.siteName} onChange={(e) => setSiteConfig({...siteConfig, siteName: e.target.value})} className="w-full bg-slate-900 border border-slate-600 rounded-xl p-4 text-white focus:ring-2 focus:ring-emerald-500 outline-none text-lg font-bold" placeholder="es. BESTOFFERS"/><p className="text-xs text-slate-500 mt-2">Appare nell'header e nel footer.</p></div>
-                        <div><label className="block text-sm font-bold text-slate-300 mb-2">Testo Footer</label><input type="text" value={siteConfig.footerText} onChange={(e) => setSiteConfig({...siteConfig, footerText: e.target.value})} className="w-full bg-slate-900 border border-slate-600 rounded-xl p-4 text-white focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="es. © 2025 Tutti i diritti riservati."/><p className="text-xs text-slate-500 mt-2">Appare in fondo a tutte le pagine.</p></div>
-                        <div className="pt-4 border-t border-slate-700 flex justify-end"><button onClick={saveSiteSettings} className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition flex items-center gap-2"><Save className="w-5 h-5" /> Salva Impostazioni</button></div>
+                    <div className="flex items-center gap-3 mb-8"><div className="bg-gray-100 p-3 rounded-xl"><Settings className="w-8 h-8 text-emerald-600" /></div><div><h1 className="text-2xl font-bold text-slate-900">Impostazioni Globali Sito</h1><p className="text-slate-600">Personalizza il nome del sito e i testi del footer.</p></div></div>
+                    <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-xl space-y-6">
+                        <div><label className="block text-sm font-bold text-slate-700 mb-2">Nome del Sito</label><input type="text" value={siteConfig.siteName} onChange={(e) => setSiteConfig({...siteConfig, siteName: e.target.value})} className="w-full bg-gray-100 border border-gray-300 rounded-xl p-4 text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none text-lg font-bold" placeholder="es. BESTOFFERS"/><p className="text-xs text-slate-500 mt-2">Appare nell'header e nel footer.</p></div>
+                        <div><label className="block text-sm font-bold text-slate-700 mb-2">Testo Footer</label><input type="text" value={siteConfig.footerText} onChange={(e) => setSiteConfig({...siteConfig, footerText: e.target.value})} className="w-full bg-gray-100 border border-gray-300 rounded-xl p-4 text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="es. © 2025 Tutti i diritti riservati."/><p className="text-xs text-slate-500 mt-2">Appare in fondo a tutte le pagine.</p></div>
+                        <div className="pt-4 border-t border-gray-200 flex justify-end"><button onClick={saveSiteSettings} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition flex items-center gap-2"><Save className="w-5 h-5" /> Salva Impostazioni</button></div>
                     </div>
                 </div>
             ) : (
@@ -757,25 +853,51 @@ const App: React.FC = () => {
                     <div className="lg:col-span-5 xl:col-span-4 h-fit sticky top-24">
                         {!generatedContent ? (
                             <>
-                                <div className="mb-6"><h1 className="text-2xl font-bold text-white mb-1">Crea Nuova Landing</h1><p className="text-slate-400 text-sm">Compila i dati e genera la tua pagina.</p></div>
-                                <div className="bg-slate-800 rounded-2xl p-6 shadow-2xl border border-slate-700 max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-600">
+                                <div className="mb-6"><h1 className="text-2xl font-bold text-slate-900 mb-1">Crea Nuova Landing</h1><p className="text-slate-600 text-sm">Compila i dati e genera la tua pagina.</p></div>
+                                <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-200 max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400">
                                     <div className="space-y-6">
                                         <div>
-                                            <label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide mb-3">Step 1: Design</label>
+                                            <label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide mb-3">Step 1: Design</label>
                                             <div className="grid grid-cols-3 gap-2">
-                                                {TEMPLATES.map((t) => (<div key={t.id} onClick={() => setSelectedTemplate(t.id)} className={`cursor-pointer relative p-2 rounded-lg border-2 transition-all text-center ${selectedTemplate === t.id ? 'border-emerald-500 bg-slate-700' : 'border-slate-700 hover:bg-slate-750'}`}><div className={`h-8 mb-1 rounded w-full ${t.color}`}></div><p className="text-[10px] font-bold text-white leading-tight">{t.name}</p></div>))}
+                                                {TEMPLATES.map((t) => (<div key={t.id} onClick={() => setSelectedTemplate(t.id)} className={`cursor-pointer relative p-2 rounded-lg border-2 transition-all text-center ${selectedTemplate === t.id ? 'border-emerald-500 bg-emerald-50' : 'border-gray-300 hover:bg-gray-100'}`}><div className={`h-8 mb-1 rounded w-full ${t.color}`}></div><p className="text-[10px] font-bold text-slate-800 leading-tight">{t.name}</p></div>))}
                                             </div>
                                         </div>
-                                        <div className="border-t border-slate-700 pt-6">
-                                            <label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide mb-3">Step 2: Dettagli</label>
+                                        <div className="border-t border-gray-200 pt-6">
+                                            <label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide mb-3">Step 2: Dettagli</label>
                                             <div className="space-y-4">
-                                                <div><label className="block text-xs font-medium text-slate-400 mb-1">Nome Prodotto</label><input type="text" value={product.name} onChange={(e) => setProduct({...product, name: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="es. Integratore FocusPro"/></div>
-                                                <div className="grid grid-cols-2 gap-3"><div><label className="block text-xs font-medium text-slate-400 mb-1">Nicchia</label><input type="text" value={product.niche} onChange={(e) => setProduct({...product, niche: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="es. Salute"/></div><div><label className="block text-xs font-medium text-slate-400 mb-1">Target</label><input type="text" value={product.targetAudience} onChange={(e) => setProduct({...product, targetAudience: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="es. Studenti"/></div></div>
-                                                <div><label className="block text-xs font-medium text-slate-400 mb-1">Foto (Carica più immagini)</label><div className="flex flex-col gap-2"><div className="w-full border border-dashed border-slate-600 hover:border-emerald-500 rounded-lg p-3 text-center cursor-pointer transition bg-slate-900/50 flex flex-col items-center justify-center gap-1 group" onClick={() => fileInputRef.current?.click()}><Images className="w-5 h-5 text-slate-500 group-hover:text-emerald-400" /><span className="text-[10px] text-slate-400">Carica Foto Prodotto</span><input type="file" ref={fileInputRef} className="hidden" multiple accept="image/*" onChange={(e) => handleImageUpload(e, false)} /></div>{product.images && product.images.length > 0 && (<div className="grid grid-cols-4 gap-2 mt-2">{product.images.map((img, idx) => (<div key={idx} className="relative aspect-square rounded border border-slate-600 overflow-hidden group"><img src={img} alt={`Preview ${idx}`} className="w-full h-full object-cover" /><button onClick={(e) => { e.stopPropagation(); removeImage(idx); }} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition text-white"><X className="w-4 h-4" /></button></div>))}</div>)}</div>{product.images && product.images.length > 0 && (<div className="bg-slate-900 p-2 rounded-lg border border-slate-700 mt-2 space-y-2"><div className="flex items-center justify-between"><span className="text-[10px] text-slate-400">Genera altre varianti AI?</span><div className="flex items-center gap-2"><span className="text-xs font-bold text-emerald-400">{imageGenerationCount}</span><input type="range" min="0" max="5" value={imageGenerationCount} onChange={(e) => setImageGenerationCount(parseInt(e.target.value))} className="w-20 accent-emerald-500 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer"/></div></div><div className="flex flex-col gap-2 pt-1 border-t border-slate-800"><div className="flex items-center gap-3"><label className="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" checked={genTechImages} onChange={(e) => setGenTechImages(e.target.checked)} className="w-3 h-3 accent-emerald-500 rounded"/><span className="text-[10px] text-slate-300">Tecniche/Esploso</span></label><label className="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" checked={genBeforeAfter} onChange={(e) => setGenBeforeAfter(e.target.checked)} className="w-3 h-3 accent-emerald-500 rounded"/><span className="text-[10px] text-slate-300">Prima/Dopo</span></label></div><label className="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" checked={genHumanUse} onChange={(e) => setGenHumanUse(e.target.checked)} className="w-3 h-3 accent-emerald-500 rounded"/><span className="text-[10px] text-slate-300">Umano/Lifestyle <span className="text-slate-500">(Usato da una persona)</span></span></label><div><input type="text" value={customImagePrompt} onChange={(e) => setCustomImagePrompt(e.target.value)} className="w-full bg-slate-800 border border-slate-600 rounded p-1.5 text-[10px] text-white placeholder-slate-500" placeholder="Prompt opzionale (es: ambientato in montagna...)"/></div></div></div>)}</div>
-                                                <div><label className="block text-xs font-medium text-slate-400 mb-1">Descrizione</label><textarea value={product.description} onChange={(e) => setProduct({...product, description: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none h-24" placeholder="Punti di forza..."/></div>
-                                                <div className="grid grid-cols-2 gap-3"><div><label className="block text-xs font-medium text-slate-400 mb-1">Tono</label><select value={product.tone} onChange={(e) => setProduct({...product, tone: e.target.value as PageTone})} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none">{Object.values(PageTone).map((t) => (<option key={t} value={t}>{t}</option>))}</select></div><div><label className="block text-xs font-medium text-slate-400 mb-1 flex items-center gap-1"><Globe className="w-3 h-3"/> Lingua Landing</label><select value={product.language} onChange={(e) => setProduct({...product, language: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none">{SUPPORTED_LANGUAGES.map((l) => (<option key={l.code} value={l.code}>{l.label}</option>))}</select></div></div>
-                                                <div><label className="block text-xs font-medium text-slate-400 mb-1">Numero Paragrafi/Features</label><div className="flex items-center gap-2 h-10 bg-slate-900 border border-slate-700 rounded-lg px-2"><input type="range" min="1" max="20" value={product.featureCount || 3} onChange={(e) => setProduct({...product, featureCount: parseInt(e.target.value)})} className="flex-1 accent-emerald-500 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer"/><span className="text-xs font-bold text-white w-5 text-center">{product.featureCount || 3}</span></div></div>
-                                                <div><label className="block text-xs font-medium text-slate-400 mb-1">Num. Recensioni</label><div className="flex items-center gap-2 h-10 bg-slate-900 border border-slate-700 rounded-lg px-2"><input type="range" min="1" max="20" value={reviewCount} onChange={(e) => setReviewCount(parseInt(e.target.value))} className="flex-1 accent-emerald-500 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer"/><span className="text-xs font-bold text-white w-5 text-center">{reviewCount}</span></div></div>
+                                                <div><label className="block text-xs font-medium text-slate-500 mb-1">Nome Prodotto</label><input type="text" value={product.name} onChange={(e) => setProduct({...product, name: e.target.value})} className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="es. Integratore FocusPro"/></div>
+                                                <div className="grid grid-cols-2 gap-3"><div><label className="block text-xs font-medium text-slate-500 mb-1">Nicchia</label><input type="text" value={product.niche} onChange={(e) => setProduct({...product, niche: e.target.value})} className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="es. Salute"/></div><div><label className="block text-xs font-medium text-slate-500 mb-1">Target</label><input type="text" value={product.targetAudience} onChange={(e) => setProduct({...product, targetAudience: e.target.value})} className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="es. Studenti"/></div></div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-slate-500 mb-1">Foto (Carica o Incolla URL)</label>
+                                                    <div className="flex flex-col gap-2">
+                                                        <div className="w-full border border-dashed border-gray-300 hover:border-emerald-500 rounded-lg p-3 text-center cursor-pointer transition bg-gray-50 flex flex-col items-center justify-center gap-1 group" onClick={() => fileInputRef.current?.click()}>
+                                                            <Images className="w-5 h-5 text-gray-400 group-hover:text-emerald-500" />
+                                                            <span className="text-[10px] text-slate-500">Carica Foto Prodotto</span>
+                                                            <input type="file" ref={fileInputRef} className="hidden" multiple accept="image/*" onChange={(e) => handleImageUpload(e, false)} />
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <input type="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="flex-1 bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Oppure incolla URL immagine..."/>
+                                                            <button onClick={() => handleAddImageUrl(imageUrl)} className="p-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition"><Plus className="w-4 h-4"/></button>
+                                                        </div>
+                                                        {product.images && product.images.length > 0 && (
+                                                            <div className="grid grid-cols-4 gap-2 mt-2">
+                                                                {product.images.map((img, idx) => (
+                                                                    <div key={idx} className="relative aspect-square rounded border border-gray-300 overflow-hidden group">
+                                                                        <img src={img} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
+                                                                        <button onClick={(e) => { e.stopPropagation(); removeImage(idx); }} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition text-white">
+                                                                            <X className="w-4 h-4" />
+                                                                        </button>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {product.images && product.images.length > 0 && (<div className="bg-gray-100 p-2 rounded-lg border border-gray-200 mt-2 space-y-2"><div className="flex items-center justify-between"><span className="text-[10px] text-slate-500">Genera altre varianti AI?</span><div className="flex items-center gap-2"><span className="text-xs font-bold text-emerald-600">{imageGenerationCount}</span><input type="range" min="0" max="5" value={imageGenerationCount} onChange={(e) => setImageGenerationCount(parseInt(e.target.value))} className="w-20 accent-emerald-500 h-1.5 bg-gray-300 rounded-lg appearance-none cursor-pointer"/></div></div><div className="flex flex-col gap-2 pt-1 border-t border-gray-200"><div className="flex items-center gap-3"><label className="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" checked={genTechImages} onChange={(e) => setGenTechImages(e.target.checked)} className="w-3 h-3 accent-emerald-500 rounded"/><span className="text-[10px] text-slate-600">Tecniche/Esploso</span></label><label className="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" checked={genBeforeAfter} onChange={(e) => setGenBeforeAfter(e.target.checked)} className="w-3 h-3 accent-emerald-500 rounded"/><span className="text-[10px] text-slate-600">Prima/Dopo</span></label></div><label className="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" checked={genHumanUse} onChange={(e) => setGenHumanUse(e.target.checked)} className="w-3 h-3 accent-emerald-500 rounded"/><span className="text-[10px] text-slate-600">Umano/Lifestyle <span className="text-slate-400">(Usato da una persona)</span></span></label><div><input type="text" value={customImagePrompt} onChange={(e) => setCustomImagePrompt(e.target.value)} className="w-full bg-white border border-gray-300 rounded p-1.5 text-[10px] text-slate-900 placeholder-slate-400" placeholder="Prompt opzionale (es: ambientato in montagna...)"/></div></div></div>)}
+                                                </div>
+                                                <div><label className="block text-xs font-medium text-slate-500 mb-1">Descrizione</label><textarea value={product.description} onChange={(e) => setProduct({...product, description: e.target.value})} className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none h-24" placeholder="Punti di forza..."/></div>
+                                                <div className="grid grid-cols-2 gap-3"><div><label className="block text-xs font-medium text-slate-500 mb-1">Tono</label><select value={product.tone} onChange={(e) => setProduct({...product, tone: e.target.value as PageTone})} className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none">{Object.values(PageTone).map((t) => (<option key={t} value={t}>{t}</option>))}</select></div><div><label className="block text-xs font-medium text-slate-500 mb-1 flex items-center gap-1"><Globe className="w-3 h-3"/> Lingua Landing</label><select value={product.language} onChange={(e) => setProduct({...product, language: e.target.value})} className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none">{SUPPORTED_LANGUAGES.map((l) => (<option key={l.code} value={l.code}>{l.label}</option>))}</select></div></div>
+                                                <div><label className="block text-xs font-medium text-slate-500 mb-1">Numero Paragrafi/Features</label><div className="flex items-center gap-2 h-10 bg-gray-50 border border-gray-300 rounded-lg px-2"><input type="range" min="1" max="20" value={product.featureCount || 3} onChange={(e) => setProduct({...product, featureCount: parseInt(e.target.value)})} className="flex-1 accent-emerald-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer"/><span className="text-xs font-bold text-slate-800 w-5 text-center">{product.featureCount || 3}</span></div></div>
+                                                <div><label className="block text-xs font-medium text-slate-500 mb-1">Num. Recensioni</label><div className="flex items-center gap-2 h-10 bg-gray-50 border border-gray-300 rounded-lg px-2"><input type="range" min="1" max="20" value={reviewCount} onChange={(e) => setReviewCount(parseInt(e.target.value))} className="flex-1 accent-emerald-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer"/><span className="text-xs font-bold text-slate-800 w-5 text-center">{reviewCount}</span></div></div>
                                                 <button onClick={handleGenerate} disabled={isGenerating} className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-lg shadow-lg hover:shadow-emerald-500/20 transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2">{isGenerating ? (<><Loader2 className="w-4 h-4 animate-spin" /> Generando...</>) : (<><Sparkles className="w-4 h-4" /> Genera Anteprima</>)}</button>
                                             </div>
                                         </div>
@@ -785,53 +907,53 @@ const App: React.FC = () => {
                         ) : (
                             <div className="animate-in fade-in slide-in-from-left-4 duration-300">
                                 <div className="flex items-center gap-2 mb-4">
-                                    <button onClick={handleDiscard} className="p-2 hover:bg-slate-800 rounded-full transition"><ArrowLeft className="w-5 h-5 text-slate-400" /></button>
-                                    <div><h1 className="text-2xl font-bold text-white mb-0.5">Modifica Pagina</h1><p className="text-slate-400 text-xs">{product.name}</p></div>
+                                    <button onClick={handleDiscard} className="p-2 hover:bg-gray-200 rounded-full transition"><ArrowLeft className="w-5 h-5 text-slate-500" /></button>
+                                    <div><h1 className="text-2xl font-bold text-slate-900 mb-0.5">Modifica Pagina</h1><p className="text-slate-500 text-xs">{product.name}</p></div>
                                 </div>
-                                <div className="flex items-center gap-2 mb-4 p-1 bg-slate-900 rounded-lg border border-slate-700">
-                                    <button onClick={() => { setEditingMode('landing'); setPreviewMode('landing'); }} className={`flex-1 text-center py-2 px-3 rounded-md text-sm font-bold transition flex items-center justify-center gap-2 ${editingMode === 'landing' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-300 hover:bg-slate-700'}`}><FileTextIcon className="w-4 h-4"/> Landing Page</button>
-                                    <button onClick={() => { setEditingMode('thankyou'); setPreviewMode('thankyou'); }} className={`flex-1 text-center py-2 px-3 rounded-md text-sm font-bold transition flex items-center justify-center gap-2 ${editingMode === 'thankyou' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-300 hover:bg-slate-700'}`}><Check className="w-4 h-4"/> Thank You Page</button>
+                                <div className="flex items-center gap-2 mb-4 p-1 bg-gray-200 rounded-lg border border-gray-300">
+                                    <button onClick={() => { setEditingMode('landing'); setPreviewMode('landing'); }} className={`flex-1 text-center py-2 px-3 rounded-md text-sm font-bold transition flex items-center justify-center gap-2 ${editingMode === 'landing' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-600 hover:bg-gray-100'}`}><FileTextIcon className="w-4 h-4"/> Landing Page</button>
+                                    <button onClick={() => { setEditingMode('thankyou'); setPreviewMode('thankyou'); }} className={`flex-1 text-center py-2 px-3 rounded-md text-sm font-bold transition flex items-center justify-center gap-2 ${editingMode === 'thankyou' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-600 hover:bg-gray-100'}`}><Check className="w-4 h-4"/> Thank You Page</button>
                                 </div>
 
-                                <div className="bg-slate-800 rounded-2xl p-6 shadow-2xl border border-slate-700 max-h-[calc(100vh-220px)] overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-600">
+                                <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-200 max-h-[calc(100vh-220px)] overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-600">
                                     {editingMode === 'landing' ? (
                                     <div className="space-y-8">
-                                        <div className="border-b border-slate-700 pb-4">
-                                            <div className="flex items-center gap-2 mb-3"><LinkIcon className="w-4 h-4 text-emerald-400" /><label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide">URL & Link</label></div>
+                                        <div className="border-b border-gray-200 pb-4">
+                                            <div className="flex items-center gap-2 mb-3"><LinkIcon className="w-4 h-4 text-emerald-600" /><label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide">URL & Link</label></div>
                                             <div className="space-y-3">
-                                                <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
-                                                    <label className="block text-[10px] font-medium text-slate-400 mb-1">Landing Page Slug</label>
+                                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                                    <label className="block text-[10px] font-medium text-slate-500 mb-1">Landing Page Slug</label>
                                                     <div className="flex items-center">
-                                                        <span className="text-xs text-slate-500 bg-slate-800 px-2 py-2 rounded-l border-y border-l border-slate-700">/s/</span>
-                                                        <input type="text" value={slug} onChange={(e) => setSlug(formatSlug(e.target.value))} className="w-full bg-slate-900 border border-slate-700 rounded-r p-2 text-sm text-white focus:border-emerald-500 outline-none font-mono" placeholder="nome-prodotto"/>
+                                                        <span className="text-xs text-slate-500 bg-gray-200 px-2 py-2 rounded-l border-y border-l border-gray-300">/s/</span>
+                                                        <input type="text" value={slug} onChange={(e) => setSlug(formatSlug(e.target.value))} className="w-full bg-white border border-gray-300 rounded-r p-2 text-sm text-slate-900 focus:border-emerald-500 outline-none font-mono" placeholder="nome-prodotto"/>
                                                     </div>
                                                 </div>
-                                                <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
-                                                    <label className="block text-[10px] font-medium text-slate-400 mb-1">Thank You Page Slug (Redirect Normale)</label>
+                                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                                    <label className="block text-[10px] font-medium text-slate-500 mb-1">Thank You Page Slug (Redirect Normale)</label>
                                                     <div className="flex items-center">
-                                                        <span className="text-xs text-slate-500 bg-slate-800 px-2 py-2 rounded-l border-y border-l border-slate-700">/s/</span>
+                                                        <span className="text-xs text-slate-500 bg-gray-200 px-2 py-2 rounded-l border-y border-l border-gray-300">/s/</span>
                                                         <input
                                                             type="text"
                                                             value={tySlug}
                                                             onChange={(e) => setTySlug(formatSlug(e.target.value))}
-                                                            className="w-full bg-slate-900 border border-slate-700 rounded-r p-2 text-sm text-white focus:border-emerald-500 outline-none font-mono"
+                                                            className="w-full bg-white border border-gray-300 rounded-r p-2 text-sm text-slate-900 focus:border-emerald-500 outline-none font-mono"
                                                             placeholder="nome-prodotto-grazie"
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
-                                                    <label className="block text-[10px] font-medium text-slate-400 mb-1">Redirect URL Esterno (Ignora la Thank You Page)</label>
-                                                     <input type="text" value={generatedContent.customThankYouUrl || ''} onChange={(e) => updateContentField('customThankYouUrl', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white" placeholder="https://altrosito.com/grazie"/>
+                                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                                    <label className="block text-[10px] font-medium text-slate-500 mb-1">Redirect URL Esterno (Ignora la Thank You Page)</label>
+                                                     <input type="text" value={generatedContent.customThankYouUrl || ''} onChange={(e) => updateContentField('customThankYouUrl', e.target.value)} className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-slate-900" placeholder="https://altrosito.com/grazie"/>
                                                 </div>
                                             </div>
                                         </div>
                                         {/* Design */}
-                                        <div><label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide mb-2">1. Design</label><div className="grid grid-cols-3 gap-2 mb-4">{TEMPLATES.map((t) => (<div key={t.id} onClick={() => setSelectedTemplate(t.id)} className={`cursor-pointer p-1.5 rounded border-2 transition-all text-center ${selectedTemplate === t.id ? 'border-emerald-500 bg-slate-700' : 'border-slate-700 hover:bg-slate-750'}`}><p className="text-[9px] font-bold text-white truncate">{t.name}</p></div>))}</div></div>
+                                        <div><label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide mb-2">1. Design</label><div className="grid grid-cols-3 gap-2 mb-4">{TEMPLATES.map((t) => (<div key={t.id} onClick={() => setSelectedTemplate(t.id)} className={`cursor-pointer p-1.5 rounded border-2 transition-all text-center ${selectedTemplate === t.id ? 'border-emerald-500 bg-emerald-50' : 'border-gray-300 hover:bg-gray-100'}`}><p className="text-[9px] font-bold text-slate-800 truncate">{t.name}</p></div>))}</div></div>
                                         {/* Price & Offer */}
-                                        <div className="border-t border-slate-700 pt-4"><label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide mb-2">2. Prezzo & Offerta</label><div className="space-y-3"><div className="grid grid-cols-2 gap-3"><div><label className="text-[10px] text-slate-400">Prezzo</label><input type="text" value={generatedContent.price} onChange={(e) => updateContentField('price', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white"/></div><div><label className="text-[10px] text-slate-400">Prezzo Originale</label><input type="text" value={generatedContent.originalPrice} onChange={(e) => updateContentField('originalPrice', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white"/></div></div><div className="grid grid-cols-2 gap-3"><div><label className="text-[10px] text-slate-400">Valuta</label><select value={generatedContent.currency} onChange={(e) => updateContentField('currency', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white">{SUPPORTED_CURRENCIES.map(c => <option key={c.symbol} value={c.symbol}>{c.label}</option>)}</select></div><div><label className="text-[10px] text-slate-400">Costo Spedizione</label><input type="text" value={generatedContent.shippingCost} onChange={(e) => updateContentField('shippingCost', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white"/></div></div><div className="flex items-center gap-2"><input type="checkbox" checked={generatedContent.enableShippingCost || false} onChange={(e) => updateContentField('enableShippingCost', e.target.checked)} className="w-4 h-4 accent-emerald-500"/><span className="text-xs text-slate-300">Mostra Costo Spedizione nel carrello</span></div><div className="grid grid-cols-2 gap-3"><div><label className="text-[10px] text-slate-400">Quantità Stock</label><input type="number" value={generatedContent.stockConfig?.quantity || 13} onChange={(e) => updateStockConfig('quantity', parseInt(e.target.value))} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white"/></div><div className="flex items-end pb-2"><label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={generatedContent.stockConfig?.enabled || false} onChange={(e) => updateStockConfig('enabled', e.target.checked)} className="w-4 h-4 accent-emerald-500 rounded"/><span className="text-xs text-slate-300">Mostra Scarsità</span></label></div></div>{generatedContent.stockConfig?.enabled && (<div className="mt-2 animate-in fade-in slide-in-from-top-1"><label className="text-[10px] text-slate-400">Testo Personalizzato (Usa <strong>{'{x}'}</strong> per il numero)</label><input type="text" placeholder="Es: Affrettati! Solo {x} pezzi rimasti!" value={generatedContent.stockConfig?.textOverride || ''} onChange={(e) => updateStockConfig('textOverride', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white placeholder-slate-600"/></div>)}<div className="bg-slate-900 p-3 rounded-lg border border-slate-700"><div className="flex items-center justify-between mb-2"><label className="text-xs font-bold text-slate-300">Notifiche Social Proof</label><input type="checkbox" checked={generatedContent.socialProofConfig?.enabled !== false} onChange={(e) => updateSocialProofConfig('enabled', e.target.checked)} className="w-4 h-4 accent-emerald-500 rounded"/></div>{generatedContent.socialProofConfig?.enabled !== false && (<div className="grid grid-cols-2 gap-2"><div><label className="text-[10px] text-slate-500">Intervallo (sec)</label><input type="number" value={generatedContent.socialProofConfig?.intervalSeconds || 10} onChange={(e) => updateSocialProofConfig('intervalSeconds', parseInt(e.target.value))} className="w-full bg-slate-800 border border-slate-700 rounded p-1 text-xs text-white"/></div><div><label className="text-[10px] text-slate-500">Max Mostre</label><input type="number" value={generatedContent.socialProofConfig?.maxShows || 4} onChange={(e) => updateSocialProofConfig('maxShows', parseInt(e.target.value))} className="w-full bg-slate-800 border border-slate-700 rounded p-1 text-xs text-white"/></div></div>)}</div>
-                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 mt-3">
+                                        <div className="border-t border-gray-200 pt-4"><label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide mb-2">2. Prezzo & Offerta</label><div className="space-y-3"><div className="grid grid-cols-2 gap-3"><div><label className="text-[10px] text-slate-500">Prezzo</label><input type="text" value={generatedContent.price} onChange={(e) => updateContentField('price', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900"/></div><div><label className="text-[10px] text-slate-500">Prezzo Originale</label><input type="text" value={generatedContent.originalPrice} onChange={(e) => updateContentField('originalPrice', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900"/></div></div><div className="grid grid-cols-2 gap-3"><div><label className="text-[10px] text-slate-500">Valuta</label><select value={generatedContent.currency} onChange={(e) => updateContentField('currency', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900">{SUPPORTED_CURRENCIES.map(c => <option key={c.symbol} value={c.symbol}>{c.label}</option>)}</select></div><div><label className="text-[10px] text-slate-500">Costo Spedizione</label><input type="text" value={generatedContent.shippingCost} onChange={(e) => updateContentField('shippingCost', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900"/></div></div><div className="flex items-center gap-2"><input type="checkbox" checked={generatedContent.enableShippingCost || false} onChange={(e) => updateContentField('enableShippingCost', e.target.checked)} className="w-4 h-4 accent-emerald-500"/><span className="text-xs text-slate-600">Mostra Costo Spedizione nel carrello</span></div><div className="grid grid-cols-2 gap-3"><div><label className="text-[10px] text-slate-500">Quantità Stock</label><input type="number" value={generatedContent.stockConfig?.quantity || 13} onChange={(e) => updateStockConfig('quantity', parseInt(e.target.value))} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900"/></div><div className="flex items-end pb-2"><label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={generatedContent.stockConfig?.enabled || false} onChange={(e) => updateStockConfig('enabled', e.target.checked)} className="w-4 h-4 accent-emerald-500 rounded"/><span className="text-xs text-slate-600">Mostra Scarsità</span></label></div></div>{generatedContent.stockConfig?.enabled && (<div className="mt-2 animate-in fade-in slide-in-from-top-1"><label className="text-[10px] text-slate-500">Testo Personalizzato (Usa <strong>{'{x}'}</strong> per il numero)</label><input type="text" placeholder="Es: Affrettati! Solo {x} pezzi rimasti!" value={generatedContent.stockConfig?.textOverride || ''} onChange={(e) => updateStockConfig('textOverride', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900 placeholder-slate-400"/></div>)}<div className="bg-gray-50 p-3 rounded-lg border border-gray-200"><div className="flex items-center justify-between mb-2"><label className="text-xs font-bold text-slate-700">Notifiche Social Proof</label><input type="checkbox" checked={generatedContent.socialProofConfig?.enabled !== false} onChange={(e) => updateSocialProofConfig('enabled', e.target.checked)} className="w-4 h-4 accent-emerald-500 rounded"/></div>{generatedContent.socialProofConfig?.enabled !== false && (<div className="grid grid-cols-2 gap-2"><div><label className="text-[10px] text-slate-500">Intervallo (sec)</label><input type="number" value={generatedContent.socialProofConfig?.intervalSeconds || 10} onChange={(e) => updateSocialProofConfig('intervalSeconds', parseInt(e.target.value))} className="w-full bg-white border border-gray-300 rounded p-1 text-xs text-slate-900"/></div><div><label className="text-[10px] text-slate-500">Max Mostre</label><input type="number" value={generatedContent.socialProofConfig?.maxShows || 4} onChange={(e) => updateSocialProofConfig('maxShows', parseInt(e.target.value))} className="w-full bg-white border border-gray-300 rounded p-1 text-xs text-slate-900"/></div></div>)}</div>
+                                            <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 mt-3">
                                                 <div className="flex items-center justify-between mb-2">
-                                                    <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5"><ShieldCheck className="w-3 h-3 text-emerald-400"/> Assicurazione Spedizione</label>
+                                                    <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5"><ShieldCheck className="w-3 h-3 text-emerald-500"/> Assicurazione Spedizione</label>
                                                     <input 
                                                         type="checkbox" 
                                                         checked={generatedContent.insuranceConfig?.enabled || false} 
@@ -840,14 +962,14 @@ const App: React.FC = () => {
                                                     />
                                                 </div>
                                                 {generatedContent.insuranceConfig?.enabled && (
-                                                    <div className="space-y-2 mt-2 pt-2 border-t border-slate-800 animate-in fade-in slide-in-from-top-1">
+                                                    <div className="space-y-2 mt-2 pt-2 border-t border-gray-200 animate-in fade-in slide-in-from-top-1">
                                                         <div>
                                                             <label className="text-[10px] text-slate-500">Etichetta</label>
                                                             <input 
                                                                 type="text" 
                                                                 value={generatedContent.insuranceConfig?.label || ''} 
                                                                 onChange={(e) => updateInsuranceConfig('label', e.target.value)} 
-                                                                className="w-full bg-slate-800 border border-slate-700 rounded p-1 text-xs text-white"
+                                                                className="w-full bg-white border border-gray-300 rounded p-1 text-xs text-slate-900"
                                                             />
                                                         </div>
                                                         <div>
@@ -856,7 +978,7 @@ const App: React.FC = () => {
                                                                 type="text" 
                                                                 value={generatedContent.insuranceConfig?.cost || '0.00'} 
                                                                 onChange={(e) => updateInsuranceConfig('cost', e.target.value)} 
-                                                                className="w-full bg-slate-800 border border-slate-700 rounded p-1 text-xs text-white"
+                                                                className="w-full bg-white border border-gray-300 rounded p-1 text-xs text-slate-900"
                                                             />
                                                         </div>
                                                         <div className="flex items-center gap-2 pt-1">
@@ -867,14 +989,14 @@ const App: React.FC = () => {
                                                                 onChange={(e) => updateInsuranceConfig('defaultChecked', e.target.checked)} 
                                                                 className="w-4 h-4 accent-emerald-500 rounded"
                                                             />
-                                                            <label htmlFor="insurance_default" className="text-xs text-slate-300 cursor-pointer">Selezionato di default</label>
+                                                            <label htmlFor="insurance_default" className="text-xs text-slate-600 cursor-pointer">Selezionato di default</label>
                                                         </div>
                                                     </div>
                                                 )}
                                             </div>
-                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 mt-3">
+                                            <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 mt-3">
                                                 <div className="flex items-center justify-between mb-2">
-                                                    <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5"><Gift className="w-3 h-3 text-purple-400"/> Aggiunta Gadget</label>
+                                                    <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5"><Gift className="w-3 h-3 text-purple-500"/> Aggiunta Gadget</label>
                                                     <input 
                                                         type="checkbox" 
                                                         checked={generatedContent.gadgetConfig?.enabled || false} 
@@ -883,14 +1005,14 @@ const App: React.FC = () => {
                                                     />
                                                 </div>
                                                 {generatedContent.gadgetConfig?.enabled && (
-                                                    <div className="space-y-2 mt-2 pt-2 border-t border-slate-800 animate-in fade-in slide-in-from-top-1">
+                                                    <div className="space-y-2 mt-2 pt-2 border-t border-gray-200 animate-in fade-in slide-in-from-top-1">
                                                         <div>
                                                             <label className="text-[10px] text-slate-500">Etichetta</label>
                                                             <input 
                                                                 type="text" 
                                                                 value={generatedContent.gadgetConfig?.label || ''} 
                                                                 onChange={(e) => updateGadgetConfig('label', e.target.value)} 
-                                                                className="w-full bg-slate-800 border border-slate-700 rounded p-1 text-xs text-white"
+                                                                className="w-full bg-white border border-gray-300 rounded p-1 text-xs text-slate-900"
                                                             />
                                                         </div>
                                                         <div>
@@ -899,7 +1021,7 @@ const App: React.FC = () => {
                                                                 type="text" 
                                                                 value={generatedContent.gadgetConfig?.cost || '0.00'} 
                                                                 onChange={(e) => updateGadgetConfig('cost', e.target.value)} 
-                                                                className="w-full bg-slate-800 border border-slate-700 rounded p-1 text-xs text-white"
+                                                                className="w-full bg-white border border-gray-300 rounded p-1 text-xs text-slate-900"
                                                             />
                                                         </div>
                                                         <div className="flex items-center gap-2 pt-1">
@@ -910,126 +1032,181 @@ const App: React.FC = () => {
                                                                 onChange={(e) => updateGadgetConfig('defaultChecked', e.target.checked)} 
                                                                 className="w-4 h-4 accent-purple-500 rounded"
                                                             />
-                                                            <label htmlFor="gadget_default" className="text-xs text-slate-300 cursor-pointer">Selezionato di default</label>
+                                                            <label htmlFor="gadget_default" className="text-xs text-slate-600 cursor-pointer">Selezionato di default</label>
                                                         </div>
                                                     </div>
                                                 )}
                                             </div>
                                         </div></div>
                                         {/* Stile & Opzioni Visive */}
-                                        <div className="border-t border-slate-700 pt-4">
-                                            <label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide mb-2">3. Stile & Opzioni Visive</label>
+                                        <div className="border-t border-gray-200 pt-4">
+                                            <label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide mb-2">3. Stile & Opzioni Visive</label>
                                             <div className="space-y-3">
                                                  <div>
-                                                    <label className="text-[10px] text-slate-400">Colore Sfondo Pagina</label>
+                                                    <label className="text-[10px] text-slate-500">Colore Sfondo Pagina</label>
                                                     <div className="flex items-center gap-2">
                                                         <input type="color" value={generatedContent.backgroundColor || '#FFFFFF'} onChange={(e) => updateContentField('backgroundColor', e.target.value)} className="w-8 h-8 bg-transparent border-none cursor-pointer"/>
-                                                        <input type="text" value={generatedContent.backgroundColor || ''} onChange={(e) => updateContentField('backgroundColor', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white" placeholder="#f8fafc"/>
+                                                        <input type="text" value={generatedContent.backgroundColor || ''} onChange={(e) => updateContentField('backgroundColor', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900" placeholder="#f8fafc"/>
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <label className="text-[10px] text-slate-400">Tipografia</label>
+                                                    <label className="text-[10px] text-slate-500">Tipografia</label>
                                                     <div className="grid grid-cols-2 gap-2">
-                                                        <select value={generatedContent.typography?.fontFamily || 'sans'} onChange={(e) => updateTypography('fontFamily', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white">
+                                                        <select value={generatedContent.typography?.fontFamily || 'sans'} onChange={(e) => updateTypography('fontFamily', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900">
                                                             <option value="sans">Sans-Serif</option><option value="serif">Serif</option><option value="mono">Mono</option>
                                                         </select>
-                                                        <select value={generatedContent.typography?.h1Size || 'lg'} onChange={(e) => updateTypography('h1Size', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white">
+                                                        <select value={generatedContent.typography?.h1Size || 'lg'} onChange={(e) => updateTypography('h1Size', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900">
                                                             <option value="sm">H1 Small</option><option value="md">H1 Medium</option><option value="lg">H1 Large</option><option value="xl">H1 XL</option><option value="2xl">H1 2XL</option>
                                                         </select>
-                                                        <select value={generatedContent.typography?.h2Size || 'md'} onChange={(e) => updateTypography('h2Size', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white">
+                                                        <select value={generatedContent.typography?.h2Size || 'md'} onChange={(e) => updateTypography('h2Size', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900">
                                                              <option value="sm">H2 Small</option><option value="md">H2 Medium</option><option value="lg">H2 Large</option><option value="xl">H2 XL</option>
                                                         </select>
-                                                        <select value={generatedContent.typography?.bodySize || 'md'} onChange={(e) => updateTypography('bodySize', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white">
+                                                        <select value={generatedContent.typography?.bodySize || 'md'} onChange={(e) => updateTypography('bodySize', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900">
                                                              <option value="sm">Body Small</option><option value="md">Body Medium</option><option value="lg">Body Large</option>
                                                         </select>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-4 pt-2">
-                                                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={generatedContent.showFeatureIcons || false} onChange={(e) => updateContentField('showFeatureIcons', e.target.checked)} className="w-4 h-4 accent-emerald-500 rounded"/><span className="text-xs text-slate-300">Mostra Icone Features</span></label>
-                                                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={generatedContent.showSocialProofBadge !== false} onChange={(e) => updateContentField('showSocialProofBadge', e.target.checked)} className="w-4 h-4 accent-emerald-500 rounded"/><span className="text-xs text-slate-300">Mostra Badge Social</span></label>
+                                                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={generatedContent.showFeatureIcons || false} onChange={(e) => updateContentField('showFeatureIcons', e.target.checked)} className="w-4 h-4 accent-emerald-500 rounded"/><span className="text-xs text-slate-600">Mostra Icone Features</span></label>
+                                                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={generatedContent.showSocialProofBadge !== false} onChange={(e) => updateContentField('showSocialProofBadge', e.target.checked)} className="w-4 h-4 accent-emerald-500 rounded"/><span className="text-xs text-slate-600">Mostra Badge Social</span></label>
                                                 </div>
                                                  <div>
-                                                    <label className="text-[10px] text-slate-400">Testo Copyright Footer (Override)</label>
-                                                    <input type="text" value={generatedContent.customFooterCopyrightText || ''} onChange={(e) => updateContentField('customFooterCopyrightText', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white"/>
+                                                    <label className="text-[10px] text-slate-500">Testo Copyright Footer (Override)</label>
+                                                    <input type="text" value={generatedContent.customFooterCopyrightText || ''} onChange={(e) => updateContentField('customFooterCopyrightText', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900"/>
                                                 </div>
                                             </div>
                                         </div>
                                         {/* Content */}
-                                        <div className="border-t border-slate-700 pt-4"><label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide mb-2">4. Contenuti Testuali</label><div className="space-y-3"><div><label className="text-[10px] text-slate-400">Headline H1</label><textarea value={generatedContent.headline} onChange={(e) => updateContentField('headline', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white"/></div><div><label className="text-[10px] text-slate-400">Sottotitolo H2</label><textarea value={generatedContent.subheadline} onChange={(e) => updateContentField('subheadline', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white"/></div><div><label className="text-[10px] text-slate-400">Testo CTA</label><input type="text" value={generatedContent.ctaText} onChange={(e) => updateContentField('ctaText', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white"/></div><div><label className="text-[10px] text-slate-400">Sottotesto CTA</label><input type="text" value={generatedContent.ctaSubtext} onChange={(e) => updateContentField('ctaSubtext', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white"/></div><div><label className="text-[10px] text-slate-400">Barra Annunci</label><input type="text" value={generatedContent.announcementBarText} onChange={(e) => updateContentField('announcementBarText', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white"/></div></div></div>
+                                        <div className="border-t border-gray-200 pt-4"><label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide mb-2">4. Contenuti Testuali</label><div className="space-y-3"><div><label className="text-[10px] text-slate-500">Headline H1</label><textarea value={generatedContent.headline} onChange={(e) => updateContentField('headline', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900"/></div><div><label className="text-[10px] text-slate-500">Sottotitolo H2</label><textarea value={generatedContent.subheadline} onChange={(e) => updateContentField('subheadline', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900"/></div><div><label className="text-[10px] text-slate-500">Testo CTA</label><input type="text" value={generatedContent.ctaText} onChange={(e) => updateContentField('ctaText', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900"/></div><div><label className="text-[10px] text-slate-500">Sottotesto CTA</label><input type="text" value={generatedContent.ctaSubtext} onChange={(e) => updateContentField('ctaSubtext', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900"/></div><div><label className="text-[10px] text-slate-500">Barra Annunci</label><input type="text" value={generatedContent.announcementBarText} onChange={(e) => updateContentField('announcementBarText', e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900"/></div></div></div>
                                         {/* Benefits */}
-                                        <div className="border-t border-slate-700 pt-4"><label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide mb-2">5. Lista Benefici</label><div className="space-y-2">{generatedContent.benefits.map((b, i) => (<div key={i} className="flex items-center gap-2"><input type="text" value={b} onChange={(e) => updateBenefit(i, e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white"/></div>))}</div></div>
+                                        <div className="border-t border-gray-200 pt-4"><label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide mb-2">5. Lista Benefici</label><div className="space-y-2">{generatedContent.benefits.map((b, i) => (<div key={i} className="flex items-center gap-2"><input type="text" value={b} onChange={(e) => updateBenefit(i, e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900"/></div>))}</div></div>
                                         {/* Features */}
-                                        <div className="border-t border-slate-700 pt-4"><label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide mb-2">6. Paragrafi / Features</label><div className="space-y-4">{generatedContent.features.map((f, i) => (<div key={i} className="bg-slate-900 p-3 rounded-lg border border-slate-700"><div className="flex items-center justify-between mb-2"><span className="text-xs font-bold text-slate-300">Feature #{i+1}</span><div><button onClick={() => moveFeature(i, 'up')} disabled={i === 0} className="p-1 disabled:opacity-30"><ArrowUp className="w-3 h-3"/></button><button onClick={() => moveFeature(i, 'down')} disabled={i === generatedContent.features.length-1} className="p-1 disabled:opacity-30"><ArrowDown className="w-3 h-3"/></button></div></div><input type="text" value={f.title} onChange={(e) => updateFeature(i, 'title', e.target.value)} className="w-full bg-slate-800 border border-slate-600 rounded p-2 text-sm text-white mb-2" placeholder="Titolo Feature"/><textarea value={f.description} onChange={(e) => updateFeature(i, 'description', e.target.value)} className="w-full bg-slate-800 border border-slate-600 rounded p-2 text-sm text-white h-20" placeholder="Descrizione Feature"/><div className="flex items-center justify-between mt-2"><label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={f.showCta} onChange={(e) => updateFeature(i, 'showCta', e.target.checked)} className="w-4 h-4 accent-emerald-500 rounded"/><span className="text-xs text-slate-300">Mostra CTA</span></label></div></div>))}</div></div>
+                                        <div className="border-t border-gray-200 pt-4"><label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide mb-2">6. Paragrafi / Features</label><div className="space-y-4">{generatedContent.features.map((f, i) => (<div key={i} className="bg-gray-50 p-3 rounded-lg border border-gray-200"><div className="flex items-center justify-between mb-2"><span className="text-xs font-bold text-slate-700">Feature #{i+1}</span><div><button onClick={() => moveFeature(i, 'up')} disabled={i === 0} className="p-1 disabled:opacity-30"><ArrowUp className="w-3 h-3"/></button><button onClick={() => moveFeature(i, 'down')} disabled={i === generatedContent.features.length-1} className="p-1 disabled:opacity-30"><ArrowDown className="w-3 h-3"/></button></div></div><input type="text" value={f.title} onChange={(e) => updateFeature(i, 'title', e.target.value)} className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-slate-900 mb-2" placeholder="Titolo Feature"/><textarea value={f.description} onChange={(e) => updateFeature(i, 'description', e.target.value)} className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-slate-900 h-20" placeholder="Descrizione Feature"/>
+                                        <div className="mt-2">
+                                            <label className="block text-[10px] text-slate-500 mb-1">Immagine Feature</label>
+                                            <div className="flex items-center gap-2">
+                                                <input type="text" value={f.image || ''} onChange={(e) => updateFeature(i, 'image', e.target.value)} className="flex-1 bg-white border border-gray-300 rounded p-1 text-[10px] text-slate-900" placeholder="Incolla URL o scegli..."/>
+                                                <button type="button" onClick={() => setImagePicker({ isOpen: true, type: 'feature', index: i })} className="p-1.5 bg-gray-200 text-slate-600 rounded hover:bg-emerald-500 hover:text-white transition" title="Scegli dalla galleria"><Images className="w-3 h-3"/></button>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between mt-2"><label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={f.showCta} onChange={(e) => updateFeature(i, 'showCta', e.target.checked)} className="w-4 h-4 accent-emerald-500 rounded"/><span className="text-xs text-slate-600">Mostra CTA</span></label></div></div>))}</div></div>
                                         {/* Reviews */}
-                                        <div className="border-t border-slate-700 pt-4"><div className="flex justify-between items-center mb-2"><label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide">7. Recensioni</label><div className="flex items-center gap-2"><button onClick={addTestimonial} className="text-xs bg-emerald-800/50 hover:bg-emerald-700/50 text-emerald-300 px-2 py-1 rounded-md transition font-bold">+ Aggiungi</button><button onClick={handleGenerateMoreReviews} disabled={isGeneratingReviews} className="text-xs bg-blue-800/50 hover:bg-blue-700/50 text-blue-300 px-2 py-1 rounded-md transition font-bold flex items-center gap-1">{isGeneratingReviews ? <Loader2 className="w-3 h-3 animate-spin"/> : <Sparkles className="w-3 h-3" />} AI</button></div></div><div className="space-y-3">{generatedContent.testimonials?.map((t, i) => (<div key={i} className="bg-slate-900 p-3 rounded-lg border border-slate-700"><div className="flex justify-between items-center mb-2"><span className="text-xs font-bold text-slate-300">Recensione #{i+1}</span><button onClick={() => removeTestimonial(i)}><X className="w-3 h-3 text-slate-500 hover:text-red-400"/></button></div><div className="grid grid-cols-2 gap-2 mb-2"><input type="text" value={t.name} onChange={(e) => updateTestimonial(i, 'name', e.target.value)} className="bg-slate-800 border border-slate-600 rounded p-1 text-xs text-white" placeholder="Nome"/><input type="text" value={t.title} onChange={(e) => updateTestimonial(i, 'title', e.target.value)} className="bg-slate-800 border border-slate-600 rounded p-1 text-xs text-white" placeholder="Titolo"/></div><textarea value={t.text} onChange={(e) => updateTestimonial(i, 'text', e.target.value)} className="w-full bg-slate-800 border border-slate-600 rounded p-1 text-xs text-white h-12" placeholder="Testo recensione"/></div>))}</div><div className="mt-4"><label className="text-[10px] text-slate-400">Posizione Recensioni (dopo quale paragrafo?)</label><input type="number" min="0" max={generatedContent.features.length} value={generatedContent.reviewsPosition === undefined ? generatedContent.features.length : generatedContent.reviewsPosition} onChange={(e) => updateContentField('reviewsPosition', parseInt(e.target.value))} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white"/></div></div>
+                                        <div className="border-t border-gray-200 pt-4"><div className="flex justify-between items-center mb-2"><label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide">7. Recensioni</label><div className="flex items-center gap-2"><button onClick={addTestimonial} className="text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-2 py-1 rounded-md transition font-bold">+ Aggiungi</button><button onClick={handleGenerateMoreReviews} disabled={isGeneratingReviews} className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 px-2 py-1 rounded-md transition font-bold flex items-center gap-1">{isGeneratingReviews ? <Loader2 className="w-3 h-3 animate-spin"/> : <Sparkles className="w-3 h-3" />} AI</button></div></div><div className="space-y-3">{generatedContent.testimonials?.map((t, i) => (<div key={i} className="bg-gray-50 p-3 rounded-lg border border-gray-200"><div className="flex justify-between items-center mb-2"><span className="text-xs font-bold text-slate-700">Recensione #{i+1}</span><button onClick={() => removeTestimonial(i)}><X className="w-3 h-3 text-slate-400 hover:text-red-500"/></button></div><div className="grid grid-cols-2 gap-2 mb-2"><input type="text" value={t.name} onChange={(e) => updateTestimonial(i, 'name', e.target.value)} className="bg-white border border-gray-300 rounded p-1 text-xs text-slate-900" placeholder="Nome"/><input type="text" value={t.title} onChange={(e) => updateTestimonial(i, 'title', e.target.value)} className="bg-white border border-gray-300 rounded p-1 text-xs text-slate-900" placeholder="Titolo"/></div><textarea value={t.text} onChange={(e) => updateTestimonial(i, 'text', e.target.value)} className="w-full bg-white border border-gray-300 rounded p-1 text-xs text-slate-900 h-12" placeholder="Testo recensione"/>
+                                        <div className="mt-2">
+                                            <label className="block text-[10px] text-slate-500 mb-1">Immagine Recensione</label>
+                                            <div className="flex items-center gap-2">
+                                                <input type="text" value={t.image || ''} onChange={(e) => updateTestimonial(i, 'image', e.target.value)} className="flex-1 bg-white border border-gray-300 rounded p-1 text-[10px] text-slate-900" placeholder="Incolla URL o scegli..."/>
+                                                <button type="button" onClick={() => setImagePicker({ isOpen: true, type: 'testimonial', index: i })} className="p-1.5 bg-gray-200 text-slate-600 rounded hover:bg-emerald-500 hover:text-white transition" title="Scegli dalla galleria"><Images className="w-3 h-3"/></button>
+                                            </div>
+                                        </div>
+                                        </div>))}</div><div className="mt-4"><label className="text-[10px] text-slate-500">Posizione Recensioni (dopo quale paragrafo?)</label><input type="number" min="0" max={generatedContent.features.length} value={generatedContent.reviewsPosition === undefined ? generatedContent.features.length : generatedContent.reviewsPosition} onChange={(e) => updateContentField('reviewsPosition', parseInt(e.target.value))} className="w-full bg-gray-50 border border-gray-300 rounded p-2 text-sm text-slate-900"/></div></div>
                                         {/* Box Content */}
-                                        <div className="border-t border-slate-700 pt-4"><div className="flex justify-between items-center mb-2"><label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide flex items-center gap-1.5"><Package className="w-4 h-4"/> Box Contenuto (Cosa Ricevi)</label><input type="checkbox" checked={generatedContent.boxContent?.enabled || false} onChange={(e) => updateBoxContent('enabled', e.target.checked)} className="w-4 h-4 accent-emerald-500 rounded"/></div>{generatedContent.boxContent?.enabled && (<div className="bg-slate-900 p-3 rounded-lg border border-slate-700 animate-in fade-in slide-in-from-top-1 space-y-2"><input type="text" placeholder="Titolo (es. Ordinando oggi ricevi:)" value={generatedContent.boxContent.title} onChange={(e) => updateBoxContent('title', e.target.value)} className="w-full bg-slate-800 border border-slate-600 rounded p-2 text-sm text-white"/><textarea placeholder="Lista (una per riga)" value={(generatedContent.boxContent.items || []).join('\n')} onChange={(e) => updateBoxContent('items', e.target.value.split('\n'))} className="w-full bg-slate-800 border border-slate-600 rounded p-2 text-sm text-white h-20"/></div>)}</div>
+                                        <div className="border-t border-gray-200 pt-4"><div className="flex justify-between items-center mb-2"><label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide flex items-center gap-1.5"><Package className="w-4 h-4"/> Box Contenuto (Cosa Ricevi)</label><input type="checkbox" checked={generatedContent.boxContent?.enabled || false} onChange={(e) => updateBoxContent('enabled', e.target.checked)} className="w-4 h-4 accent-emerald-500 rounded"/></div>{generatedContent.boxContent?.enabled && (<div className="bg-gray-50 p-3 rounded-lg border border-gray-200 animate-in fade-in slide-in-from-top-1 space-y-2"><input type="text" placeholder="Titolo (es. Ordinando oggi ricevi:)" value={generatedContent.boxContent.title} onChange={(e) => updateBoxContent('title', e.target.value)} className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-slate-900"/><textarea placeholder="Lista (una per riga)" value={(generatedContent.boxContent.items || []).join('\n')} onChange={(e) => updateBoxContent('items', e.target.value.split('\n'))} className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-slate-900 h-20"/>
+                                        <div className="mt-2">
+                                            <label className="block text-[10px] text-slate-500 mb-1">Immagine Box</label>
+                                            <div className="flex items-center gap-2">
+                                                <input type="text" value={generatedContent.boxContent.image || ''} onChange={(e) => updateBoxContent('image', e.target.value)} className="flex-1 bg-white border border-gray-300 rounded p-1 text-[10px] text-slate-900" placeholder="Incolla URL o scegli..."/>
+                                                <button type="button" onClick={() => setImagePicker({ isOpen: true, type: 'box', index: null })} className="p-1.5 bg-gray-200 text-slate-600 rounded hover:bg-emerald-500 hover:text-white transition" title="Scegli dalla galleria"><Images className="w-3 h-3"/></button>
+                                            </div>
+                                        </div>
+                                        </div>)}</div>
                                         {/* Images */}
-                                        <div className="border-t border-slate-700 pt-4"><div className="flex justify-between items-center mb-2"><label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide">8. Immagini Galleria</label><div className="flex items-center gap-2"><button onClick={handleGenerateMoreImages} disabled={isGeneratingImage} className="text-xs bg-blue-800/50 hover:bg-blue-700/50 text-blue-300 px-2 py-1 rounded-md transition font-bold flex items-center gap-1">{isGeneratingImage ? <Loader2 className="w-3 h-3 animate-spin"/> : <Sparkles className="w-3 h-3"/>}AI</button><button onClick={() => galleryInputRef.current?.click()} className="text-xs bg-emerald-800/50 hover:bg-emerald-700/50 text-emerald-300 px-2 py-1 rounded-md transition font-bold flex items-center gap-1"><Upload className="w-3 h-3"/>Carica</button><input type="file" ref={galleryInputRef} multiple accept="image/*" className="hidden" onChange={handleGalleryUpload}/></div></div><div className="grid grid-cols-3 gap-2">{generatedContent.generatedImages?.map((img, i) => (<div key={i} className="relative aspect-square rounded overflow-hidden group border border-slate-700"><img src={img} className="w-full h-full object-cover"/><div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1"><button onClick={() => moveGalleryImage(i, 'left')} disabled={i === 0} className="p-1 text-white bg-white/10 rounded-full hover:bg-white/20 disabled:opacity-30"><ChevronLeft className="w-3 h-3"/></button><button onClick={() => removeGalleryImage(img)} className="p-1 text-white bg-red-500/50 rounded-full hover:bg-red-500"><X className="w-3 h-3"/></button><button onClick={() => moveGalleryImage(i, 'right')} disabled={i === (generatedContent.generatedImages?.length || 0)-1} className="p-1 text-white bg-white/10 rounded-full hover:bg-white/20 disabled:opacity-30"><ChevronRight className="w-3 h-3"/></button></div>{i === 0 && <span className="absolute top-1 left-1 bg-emerald-500 text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold">HERO</span>}</div>))}</div></div>
+                                        <div className="border-t border-gray-200 pt-4"><div className="flex justify-between items-center mb-2"><label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide">8. Immagini Galleria</label><div className="flex items-center gap-2"><button onClick={handleGenerateMoreImages} disabled={isGeneratingImage} className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 px-2 py-1 rounded-md transition font-bold flex items-center gap-1">{isGeneratingImage ? <Loader2 className="w-3 h-3 animate-spin"/> : <Sparkles className="w-3 h-3"/>}AI</button><button onClick={() => galleryInputRef.current?.click()} className="text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-2 py-1 rounded-md transition font-bold flex items-center gap-1"><Upload className="w-3 h-3"/>Carica</button><input type="file" ref={galleryInputRef} multiple accept="image/*" className="hidden" onChange={handleGalleryUpload}/></div></div>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <input 
+                                                type="url"
+                                                value={galleryImageUrl}
+                                                onChange={(e) => setGalleryImageUrl(e.target.value)}
+                                                onKeyDown={(e) => { 
+                                                    if (e.key === 'Enter') { 
+                                                        addGalleryImageUrl(galleryImageUrl); 
+                                                        setGalleryImageUrl(''); 
+                                                        e.preventDefault(); 
+                                                    } 
+                                                }}
+                                                className="flex-1 bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-slate-900" 
+                                                placeholder="Incolla URL e premi Invio..."
+                                            />
+                                            <button 
+                                                onClick={() => { addGalleryImageUrl(galleryImageUrl); setGalleryImageUrl(''); }} 
+                                                className="p-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition"
+                                            >
+                                                <Plus className="w-4 h-4"/>
+                                            </button>
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-2">{generatedContent.generatedImages?.map((img, i) => (<div key={i} className="relative aspect-square rounded overflow-hidden group border border-gray-300"><img src={img} className="w-full h-full object-cover"/><div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1"><button onClick={() => moveGalleryImage(i, 'left')} disabled={i === 0} className="p-1 text-white bg-white/10 rounded-full hover:bg-white/20 disabled:opacity-30"><ChevronLeft className="w-3 h-3"/></button><button onClick={() => removeGalleryImage(img)} className="p-1 text-white bg-red-500/50 rounded-full hover:bg-red-500"><X className="w-3 h-3"/></button><button onClick={() => moveGalleryImage(i, 'right')} disabled={i === (generatedContent.generatedImages?.length || 0)-1} className="p-1 text-white bg-white/10 rounded-full hover:bg-white/20 disabled:opacity-30"><ChevronRight className="w-3 h-3"/></button></div>{i === 0 && <span className="absolute top-1 left-1 bg-emerald-500 text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold">HERO</span>}</div>))}</div></div>
                                         {/* Form */}
-                                        <div className="border-t border-slate-700 pt-4"><label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide mb-2">9. Form Contatti</label><div className="space-y-2">{generatedContent.formConfiguration?.map((field, i) => (<div key={field.id} className="grid grid-cols-12 gap-2 items-center bg-slate-900/50 p-2 rounded-lg border border-slate-700"><div className="col-span-5"><input type="text" value={field.label} onChange={(e) => updateFormConfig(i, 'label', e.target.value)} className="w-full bg-slate-800 border border-slate-600 rounded p-1 text-xs text-white"/></div><div className="col-span-3 text-center"><label className="flex items-center justify-center gap-1 cursor-pointer"><input type="checkbox" checked={field.enabled} onChange={(e) => updateFormConfig(i, 'enabled', e.target.checked)} className="w-3 h-3 accent-emerald-500 rounded"/><span className="text-[10px] text-slate-400">On</span></label></div><div className="col-span-4 text-center"><label className="flex items-center justify-center gap-1 cursor-pointer"><input type="checkbox" checked={field.required} onChange={(e) => updateFormConfig(i, 'required', e.target.checked)} disabled={!field.enabled} className="w-3 h-3 accent-emerald-500 rounded disabled:opacity-30"/><span className="text-[10px] text-slate-400">Req.</span></label></div></div>))}</div></div>
+                                        <div className="border-t border-gray-200 pt-4"><label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide mb-2">9. Form Contatti</label><div className="space-y-2">{generatedContent.formConfiguration?.map((field, i) => (<div key={field.id} className="grid grid-cols-12 gap-2 items-center bg-gray-50 p-2 rounded-lg border border-gray-200"><div className="col-span-5"><input type="text" value={field.label} onChange={(e) => updateFormConfig(i, 'label', e.target.value)} className="w-full bg-white border border-gray-300 rounded p-1 text-xs text-slate-900"/></div><div className="col-span-3 text-center"><label className="flex items-center justify-center gap-1 cursor-pointer"><input type="checkbox" checked={field.enabled} onChange={(e) => updateFormConfig(i, 'enabled', e.target.checked)} className="w-3 h-3 accent-emerald-500 rounded"/><span className="text-[10px] text-slate-500">On</span></label></div><div className="col-span-4 text-center"><label className="flex items-center justify-center gap-1 cursor-pointer"><input type="checkbox" checked={field.required} onChange={(e) => updateFormConfig(i, 'required', e.target.checked)} disabled={!field.enabled} className="w-3 h-3 accent-emerald-500 rounded disabled:opacity-30"/><span className="text-[10px] text-slate-500">Req.</span></label></div></div>))}</div></div>
                                         {/* Translations */}
-                                        {generatedContent.uiTranslation && (<div className="border-t border-slate-700 pt-4"><label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide mb-2">10. Testi Interfaccia</label><div className="grid grid-cols-2 gap-2">{Object.entries(generatedContent.uiTranslation).slice(0, 16).map(([key, value]) => (<div key={key}><label className="text-[10px] text-slate-400 capitalize">{key.replace(/([A-Z])/g, ' $1')}</label><input type="text" value={value as string} onChange={(e) => updateUiTranslation(key as keyof UiTranslation, e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-1 text-xs text-white"/></div>))}</div></div>)}
+                                        {generatedContent.uiTranslation && (<div className="border-t border-gray-200 pt-4"><label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide mb-2">10. Testi Interfaccia</label><div className="grid grid-cols-2 gap-2">{Object.entries(generatedContent.uiTranslation).slice(0, 16).map(([key, value]) => (<div key={key}><label className="text-[10px] text-slate-500 capitalize">{key.replace(/([A-Z])/g, ' $1')}</label><input type="text" value={value as string} onChange={(e) => updateUiTranslation(key as keyof UiTranslation, e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded p-1 text-xs text-slate-900"/></div>))}</div></div>)}
                                         {/* Scripts */}
-                                        <div className="border-t border-slate-700 pt-4">
-                                            <div className="flex items-center gap-2 mb-3"><Code className="w-4 h-4 text-emerald-400" /><label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide">11. Tracking & Scripts</label></div>
+                                        <div className="border-t border-gray-200 pt-4">
+                                            <div className="flex items-center gap-2 mb-3"><Code className="w-4 h-4 text-emerald-600" /><label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide">11. Tracking & Scripts</label></div>
                                             <div className="space-y-3">
-                                                <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
-                                                    <label className="text-[10px] text-slate-400">Webhook URL</label>
-                                                    <input type="url" value={generatedContent.webhookUrl || ''} onChange={(e) => updateContentField('webhookUrl', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white" placeholder="https://..."/>
+                                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                                    <label className="text-[10px] text-slate-500">Webhook URL</label>
+                                                    <input type="url" value={generatedContent.webhookUrl || ''} onChange={(e) => updateContentField('webhookUrl', e.target.value)} className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-slate-900" placeholder="https://..."/>
                                                 </div>
-                                                <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
-                                                    <label className="text-[10px] text-slate-400">Meta Pixel (Landing)</label>
-                                                    <textarea value={generatedContent.metaLandingHtml || ''} onChange={(e) => updateContentField('metaLandingHtml', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white font-mono h-24" placeholder="<script>...</script>"/>
+                                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                                    <label className="text-[10px] text-slate-500">Meta Pixel (Landing)</label>
+                                                    <textarea value={generatedContent.metaLandingHtml || ''} onChange={(e) => updateContentField('metaLandingHtml', e.target.value)} className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-slate-900 font-mono h-24" placeholder="<script>...</script>"/>
                                                 </div>
-                                                <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
-                                                    <label className="text-[10px] text-slate-400">TikTok Pixel (Landing)</label>
-                                                    <textarea value={generatedContent.tiktokLandingHtml || ''} onChange={(e) => updateContentField('tiktokLandingHtml', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white font-mono h-24" placeholder="<script>...</script>"/>
+                                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                                    <label className="text-[10px] text-slate-500">TikTok Pixel (Landing)</label>
+                                                    <textarea value={generatedContent.tiktokLandingHtml || ''} onChange={(e) => updateContentField('tiktokLandingHtml', e.target.value)} className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-slate-900 font-mono h-24" placeholder="<script>...</script>"/>
                                                 </div>
-                                                 <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
-                                                    <label className="text-[10px] text-slate-400">HTML Extra Body (Landing)</label>
-                                                    <textarea value={generatedContent.extraLandingHtml || ''} onChange={(e) => updateContentField('extraLandingHtml', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white font-mono h-24" placeholder="<div>...</div>"/>
+                                                 <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                                    <label className="text-[10px] text-slate-500">HTML Extra Body (Landing)</label>
+                                                    <textarea value={generatedContent.extraLandingHtml || ''} onChange={(e) => updateContentField('extraLandingHtml', e.target.value)} className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-slate-900 font-mono h-24" placeholder="<div>...</div>"/>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     ) : (
                                         <div className="space-y-8 animate-in fade-in">
-                                             <div className="border-b border-slate-700 pb-4">
-                                                <div className="flex items-center gap-2 mb-3"><ImageIcon className="w-4 h-4 text-emerald-400" /><label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide">Contenuti Thank You Page</label></div>
+                                             <div className="border-b border-gray-200 pb-4">
+                                                <div className="flex items-center gap-2 mb-3"><ImageIcon className="w-4 h-4 text-emerald-600" /><label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide">Contenuti Thank You Page</label></div>
                                                 <div className="space-y-3">
-                                                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
-                                                        <label className="text-[10px] text-slate-400">Titolo (Usa {'{name}'} e {'{phone}'})</label>
-                                                        <input type="text" value={generatedThankYouContent?.headline || ''} onChange={(e) => updateContentField('headline', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white"/>
+                                                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                                        <label className="text-[10px] text-slate-500">Titolo (Usa {'{name}'} e {'{phone}'})</label>
+                                                        <input type="text" value={generatedThankYouContent?.headline || ''} onChange={(e) => updateContentField('headline', e.target.value)} className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-slate-900"/>
                                                     </div>
-                                                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
-                                                        <label className="text-[10px] text-slate-400">Messaggio (Usa {'{name}'} e {'{phone}'})</label>
-                                                        <textarea value={generatedThankYouContent?.subheadline || ''} onChange={(e) => updateContentField('subheadline', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white h-20"/>
+                                                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                                        <label className="text-[10px] text-slate-500">Messaggio (Usa {'{name}'} e {'{phone}'})</label>
+                                                        <textarea value={generatedThankYouContent?.subheadline || ''} onChange={(e) => updateContentField('subheadline', e.target.value)} className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-slate-900 h-20"/>
                                                     </div>
-                                                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
-                                                        <label className="text-[10px] text-slate-400">Immagine Principale</label>
+                                                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                                        <label className="text-[10px] text-slate-500">Immagine Principale</label>
                                                         <div className="flex items-center gap-2">
-                                                            <div className="w-16 h-16 bg-slate-800 rounded-lg overflow-hidden border border-slate-700"><img src={generatedThankYouContent?.heroImageBase64 || ''} className="w-full h-full object-cover"/></div>
-                                                            <button onClick={() => tyImageInputRef.current?.click()} className="flex-1 border border-dashed border-slate-600 text-slate-400 text-xs py-2 rounded-lg hover:border-emerald-500 hover:text-emerald-400">Cambia Immagine</button>
+                                                            <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+                                                                {generatedThankYouContent?.heroImageBase64 && <img src={generatedThankYouContent.heroImageBase64} className="w-full h-full object-cover"/>}
+                                                            </div>
+                                                            <div className="flex-1 flex flex-col gap-1">
+                                                                <div className="flex items-center gap-1">
+                                                                    <input type="text" value={generatedThankYouContent?.heroImageBase64 || ''} onChange={(e) => updateContentField('heroImageBase64', e.target.value)} className="flex-1 bg-white border border-gray-300 rounded p-1 text-[10px] text-slate-900" placeholder="Incolla URL o scegli..."/>
+                                                                    <button type="button" onClick={() => setImagePicker({ isOpen: true, type: 'thankyou', index: null })} className="p-1.5 bg-gray-200 text-slate-600 rounded hover:bg-emerald-500 hover:text-white transition" title="Scegli dalla galleria"><Images className="w-3 h-3"/></button>
+                                                                </div>
+                                                                <button onClick={() => tyImageInputRef.current?.click()} className="w-full border border-dashed border-gray-300 text-slate-500 text-xs py-2 rounded-lg hover:border-emerald-500 hover:text-emerald-500">o Carica...</button>
+                                                            </div>
                                                             <input type="file" ref={tyImageInputRef} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, true)} />
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                             <div className="border-b border-slate-700 pb-4">
-                                                <div className="flex items-center gap-2 mb-3"><Code className="w-4 h-4 text-emerald-400" /><label className="block text-xs font-bold text-emerald-400 uppercase tracking-wide">Tracking & Scripts (Thank You Page)</label></div>
+                                             <div className="border-b border-gray-200 pb-4">
+                                                <div className="flex items-center gap-2 mb-3"><Code className="w-4 h-4 text-emerald-600" /><label className="block text-xs font-bold text-emerald-600 uppercase tracking-wide">Tracking & Scripts (Thank You Page)</label></div>
                                                 <div className="space-y-3">
-                                                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
-                                                        <label className="text-[10px] text-slate-400">Meta Pixel</label>
-                                                        <textarea value={generatedThankYouContent?.metaThankYouHtml || ''} onChange={(e) => updateContentField('metaThankYouHtml', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white font-mono h-24" placeholder="<script>...</script>"/>
+                                                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                                        <label className="text-[10px] text-slate-500">Meta Pixel</label>
+                                                        <textarea value={generatedThankYouContent?.metaThankYouHtml || ''} onChange={(e) => updateContentField('metaThankYouHtml', e.target.value)} className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-slate-900 font-mono h-24" placeholder="<script>...</script>"/>
                                                     </div>
-                                                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
-                                                        <label className="text-[10px] text-slate-400">TikTok Pixel</label>
-                                                        <textarea value={generatedThankYouContent?.tiktokThankYouHtml || ''} onChange={(e) => updateContentField('tiktokThankYouHtml', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white font-mono h-24" placeholder="<script>...</script>"/>
+                                                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                                        <label className="text-[10px] text-slate-500">TikTok Pixel</label>
+                                                        <textarea value={generatedThankYouContent?.tiktokThankYouHtml || ''} onChange={(e) => updateContentField('tiktokThankYouHtml', e.target.value)} className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-slate-900 font-mono h-24" placeholder="<script>...</script>"/>
                                                     </div>
-                                                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
-                                                        <label className="text-[10px] text-slate-400">HTML Extra Body (Thank You)</label>
-                                                        <textarea value={generatedThankYouContent?.extraThankYouHtml || ''} onChange={(e) => updateContentField('extraThankYouHtml', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white font-mono h-24" placeholder="<div>...</div>"/>
+                                                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                                        <label className="text-[10px] text-slate-500">HTML Extra Body (Thank You)</label>
+                                                        <textarea value={generatedThankYouContent?.extraThankYouHtml || ''} onChange={(e) => updateContentField('extraThankYouHtml', e.target.value)} className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-slate-900 font-mono h-24" placeholder="<div>...</div>"/>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1045,8 +1222,8 @@ const App: React.FC = () => {
                             <>
                                 <div className="flex justify-between items-center mb-6">
                                     <div>
-                                        <h2 className="text-2xl font-bold text-white mb-1">Pagine Pubblicate</h2>
-                                        <p className="text-slate-400 text-sm">Modifica, duplica o elimina le tue landing page.</p>
+                                        <h2 className="text-2xl font-bold text-slate-900 mb-1">Pagine Pubblicate</h2>
+                                        <p className="text-slate-600 text-sm">Modifica, duplica o elimina le tue landing page.</p>
                                     </div>
                                 </div>
                                 {isLoadingPages ? (
@@ -1066,9 +1243,9 @@ const App: React.FC = () => {
                                             ))}
                                         </div>
                                     ) : (
-                                        <div className="text-center py-20 border-2 border-dashed border-slate-700 rounded-2xl bg-slate-800/50">
-                                            <h2 className="text-xl font-bold text-white">Nessuna pagina ancora creata.</h2>
-                                            <p className="text-slate-400 mt-2">Usa il modulo a sinistra per generare la tua prima landing page.</p>
+                                        <div className="text-center py-20 border-2 border-dashed border-gray-300 rounded-2xl bg-white">
+                                            <h2 className="text-xl font-bold text-slate-700">Nessuna pagina ancora creata.</h2>
+                                            <p className="text-slate-500 mt-2">Usa il modulo a sinistra per generare la tua prima landing page.</p>
                                         </div>
                                     )
                                 )}
@@ -1076,11 +1253,11 @@ const App: React.FC = () => {
                         ) : (
                             <>
                                 <div className="flex justify-between items-center mb-6">
-                                    <div><h2 className="text-xl font-bold text-white">Anteprima Live</h2><p className="text-slate-400 text-sm">Visualizza la pagina generata.</p></div>
-                                    <div className="flex gap-1 bg-slate-800 p-1 rounded-lg border border-slate-700"><button onClick={() => setPreviewDevice('mobile')} className={`p-2 rounded-md transition ${previewDevice === 'mobile' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'}`}><Smartphone className="w-5 h-5"/></button><button onClick={() => setPreviewDevice('tablet')} className={`p-2 rounded-md transition ${previewDevice === 'tablet' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'}`}><Tablet className="w-5 h-5"/></button><button onClick={() => setPreviewDevice('desktop')} className={`p-2 rounded-md transition ${previewDevice === 'desktop' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'}`}><Monitor className="w-5 h-5"/></button></div>
+                                    <div><h2 className="text-xl font-bold text-slate-900">Anteprima Live</h2><p className="text-slate-500 text-sm">Visualizza la pagina generata.</p></div>
+                                    <div className="flex gap-1 bg-white p-1 rounded-lg border border-gray-200 shadow-sm"><button onClick={() => setPreviewDevice('mobile')} className={`p-2 rounded-md transition ${previewDevice === 'mobile' ? 'bg-emerald-500 text-white' : 'text-slate-500 hover:text-slate-800'}`}><Smartphone className="w-5 h-5"/></button><button onClick={() => setPreviewDevice('tablet')} className={`p-2 rounded-md transition ${previewDevice === 'tablet' ? 'bg-emerald-500 text-white' : 'text-slate-500 hover:text-slate-800'}`}><Tablet className="w-5 h-5"/></button><button onClick={() => setPreviewDevice('desktop')} className={`p-2 rounded-md transition ${previewDevice === 'desktop' ? 'bg-emerald-500 text-white' : 'text-slate-500 hover:text-slate-800'}`}><Monitor className="w-5 h-5"/></button></div>
                                </div>
-                               <div className={`mx-auto bg-slate-700 border-8 border-slate-700 rounded-[32px] shadow-2xl transition-all duration-500 relative ${previewDevice === 'mobile' ? 'w-[380px] h-[780px]' : (previewDevice === 'tablet' ? 'w-[780px] h-[1040px]' : 'w-full h-[85vh]')}`}>
-                                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-700 rounded-b-xl"></div>
+                               <div className={`mx-auto bg-gray-900 border-8 border-gray-900 rounded-[32px] shadow-2xl transition-all duration-500 relative ${previewDevice === 'mobile' ? 'w-[380px] h-[780px]' : (previewDevice === 'tablet' ? 'w-[780px] h-[1040px]' : 'w-full h-[85vh]')}`}>
+                                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-32 h-6 bg-gray-900 rounded-b-xl"></div>
                                     <div className={`w-full h-full bg-white overflow-y-auto overflow-x-hidden rounded-[24px] scrollbar-thin scrollbar-thumb-slate-400 ${previewDevice === 'desktop' ? 'scrollbar-thumb-rounded-full' : ''}`}>
                                         {!generatedContent ? (<div className="flex flex-col items-center justify-center h-full text-slate-400 text-center p-8"><MonitorPlay className="w-16 h-16 mb-4 text-slate-500" /><h3 className="font-bold text-lg text-slate-300">L'anteprima apparirà qui</h3><p className="text-sm">Compila i campi a sinistra per iniziare.</p></div>) : (
                                             <>
@@ -1092,7 +1269,7 @@ const App: React.FC = () => {
                                             </>
                                         )}
                                     </div>
-                                    {generatedContent && (<div className="absolute bottom-4 right-4 z-50 flex items-center gap-2"><button onClick={() => setPreviewMode(p => p === 'landing' ? 'thankyou' : 'landing')} className="bg-slate-900/80 text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 backdrop-blur-sm border border-slate-600 hover:bg-slate-800"><RefreshCcw className="w-3 h-3"/> Switch View</button><button onClick={handleSaveToDb} disabled={isSaving} className="bg-emerald-600/90 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center gap-1.5 backdrop-blur-sm border border-emerald-400/50 hover:bg-emerald-600 shadow-lg">{isSaving ? <Loader2 className="w-4 h-4 animate-spin"/> : <Save className="w-4 h-4"/>} {editingPageId ? "Aggiorna" : "Pubblica"}</button></div>)}
+                                    {generatedContent && (<div className="absolute bottom-4 right-4 z-50 flex items-center gap-2"><button onClick={() => setPreviewMode(p => p === 'landing' ? 'thankyou' : 'landing')} className="bg-white/80 text-slate-800 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 backdrop-blur-sm border border-gray-200 hover:bg-white"><RefreshCcw className="w-3 h-3"/> Switch View</button><button onClick={handleSaveToDb} disabled={isSaving} className="bg-emerald-600/90 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center gap-1.5 backdrop-blur-sm border border-emerald-400/50 hover:bg-emerald-600 shadow-lg">{isSaving ? <Loader2 className="w-4 h-4 animate-spin"/> : <Save className="w-4 h-4"/>} {editingPageId ? "Aggiorna" : "Pubblica"}</button></div>)}
                                </div>
                             </>
                         )}
