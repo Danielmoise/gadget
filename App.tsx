@@ -726,7 +726,19 @@ const App: React.FC = () => {
                 
                 <div className="hidden md:flex gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800"><button onClick={() => setAdminSection('pages')} className={`px-3 py-1.5 rounded text-xs font-bold transition ${adminSection === 'pages' ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-white'}`}>Generatore</button><button onClick={() => setAdminSection('settings')} className={`px-3 py-1.5 rounded text-xs font-bold transition ${adminSection === 'settings' ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-white'}`}>Impostazioni Sito</button></div>
             </div>
-            <div className="flex items-center gap-4"><button onClick={() => setView('home')} className="text-sm text-slate-400 hover:text-white mr-4">Vedi Sito Pubblico</button><span className="text-xs bg-slate-800 px-2 py-1 rounded text-slate-500 hidden sm:block">{session.email}</span><button onClick={handleLogout} className="p-2 hover:bg-slate-800 rounded-lg transition text-slate-400 hover:text-white"><LogOut className="w-5 h-5" /></button></div>
+            <div className="flex items-center gap-4">
+                <button
+                    onClick={() => setIsMapOpen(true)}
+                    className="flex items-center gap-2 text-sm text-emerald-400 hover:text-white transition-colors font-semibold py-1 px-3 rounded-full bg-slate-800 border border-slate-700"
+                >
+                    <span className="relative flex h-2.5 w-2.5">
+                        {onlineUsers.length > 0 && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>}
+                        <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${onlineUsers.length > 0 ? 'bg-emerald-500' : 'bg-slate-600'}`}></span>
+                    </span>
+                    <span>{onlineUsers.length} Live</span>
+                </button>
+                <button onClick={() => setView('home')} className="text-sm text-slate-400 hover:text-white mr-4">Vedi Sito Pubblico</button><span className="text-xs bg-slate-800 px-2 py-1 rounded text-slate-500 hidden sm:block">{session.email}</span><button onClick={handleLogout} className="p-2 hover:bg-slate-800 rounded-lg transition text-slate-400 hover:text-white"><LogOut className="w-5 h-5" /></button>
+            </div>
           </div>
         </nav>
         <main className="container mx-auto px-4 py-12">
