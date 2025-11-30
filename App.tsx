@@ -20,6 +20,8 @@ interface OnlineUser {
     country?: string;
     ip?: string;
     online_at: string;
+    action?: 'purchased';
+    pageUrl?: string;
 }
 
 const TEMPLATES: { id: TemplateId; name: string; desc: string; color: string }[] = [
@@ -110,7 +112,23 @@ const LiveMapModal = ({ isOpen, onClose, users }: { isOpen: boolean, onClose: ()
             }
             if (mapInstance.current) {
                 mapInstance.current.eachLayer((layer: any) => { if (!layer._url) mapInstance.current.removeLayer(layer); });
-                users.forEach(user => { if (user.lat && user.lon) { window.L.circleMarker([user.lat, user.lon], { radius: 6, fillColor: "#10b981", color: "#333", weight: 2, opacity: 1, fillOpacity: 0.8 }).addTo(mapInstance.current).bindPopup(`<b>${user.city || 'Sconosciuto'}, ${user.country || 'N/A'}</b><br>IP: ${user.ip || 'Hidden'}`); } });
+                users.forEach(user => {
+                    if (user.lat && user.lon) {
+                        const isPurchase = user.action === 'purchased';
+                        const options = {
+                            radius: isPurchase ? 12 : 6,
+                            fillColor: isPurchase ? "#f59e0b" : "#10b981",
+                            color: isPurchase ? "#92400e" : "#333",
+                            weight: 2,
+                            opacity: 1,
+                            fillOpacity: 0.9
+                        };
+                        const popupText = isPurchase
+                            ? `<b>⭐ ACQUISTO EFFETTUATO!</b><br>Da: ${user.pageUrl || 'Pagina Sconosciuta'}<br>${user.city || 'Città'}, ${user.country || 'N/A'}`
+                            : `<b>${user.city || 'Sconosciuto'}, ${user.country || 'N/A'}</b><br>IP: ${user.ip || 'Hidden'}`;
+                        window.L.circleMarker([user.lat, user.lon], options).addTo(mapInstance.current).bindPopup(popupText);
+                    }
+                });
             }
         }, 100);
         return () => clearTimeout(timer);
@@ -298,6 +316,7 @@ const App: React.FC = () => {
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [imagePicker, setImagePicker] = useState<{ isOpen: boolean; type: 'feature' | 'testimonial' | 'box' | 'thankyou'; index: number | null }>({ isOpen: false, type: 'feature', index: null });
+  const userIdRef = useRef(Math.random().toString(36).substring(7));
 
 
   const fetchPublicPages = useCallback(async () => {
@@ -345,6 +364,7 @@ const App: React.FC = () => {
     fetchSettings();
     let authSubscription: { unsubscribe: () => void } | null = null;
     let presenceChannel: any = null;
+    let eventsChannel: any = null;
 
     if (isSupabaseConfigured() && supabase) {
       supabase.auth.getSession().then(({ data: { session } }) => { if (session?.user) setSession({ id: session.user.id, email: session.user.email || '' }); });
@@ -369,7 +389,7 @@ const App: React.FC = () => {
       }).subscribe(async (status: string) => {
           if (status === 'SUBSCRIBED') {
               const currentUser: OnlineUser = {
-                  id: Math.random().toString(36).substring(7),
+                  id: userIdRef.current,
                   online_at: new Date().toISOString()
               };
 
@@ -388,6 +408,18 @@ const App: React.FC = () => {
               await presenceChannel.track(currentUser);
           }
       });
+      
+      eventsChannel = supabase.channel('page_events');
+      eventsChannel.on('broadcast', { event: 'purchase' }, ({ payload }: { payload: { userId: string, pageUrl: string } }) => {
+          setOnlineUsers(prevUsers =>
+              prevUsers.map(user =>
+                  user.id === payload.userId
+                      ? { ...user, action: 'purchased', pageUrl: payload.pageUrl }
+                      : user
+              )
+          );
+      }).subscribe();
+
     } else {
         setIsLoadingPages(false);
         setPublicPages([{ id: '1', created_at: new Date().toISOString(), product_name: 'CryptoBot 3000', niche: 'Finanza', is_published: true, slug: 'cryptobot-3000', thank_you_slug: 'cryptobot-3000-grazie', content: { templateId: 'classic', language: 'Italiano', headline: "Sblocca i tuoi guadagni", subheadline: "Il bot di trading automatico n.1", heroImagePrompt: "trading", benefits: ["Sicuro", "Veloce"], features: [], testimonial: { name: "Test", role: "User", text: "Wow" }, testimonials: [{ name: "Test", role: "User", text: "Wow" }], ctaText: "Compra Ora", ctaSubtext: "Garanzia", colorScheme: "blue", niche: "Finanza", price: "49.00", currency: "€", originalPrice: "99.00", showDiscount: true, announcementBarText: "SPEDIZIONE GRATUITA + PAGAMENTO ALLA CONSEGNA", formConfiguration: DEFAULT_FORM_CONFIG, showSocialProofBadge: true, socialProofConfig: { enabled: true, intervalSeconds: 10, maxShows: 4 }, shippingCost: "0", enableShippingCost: false } }]);
@@ -442,10 +474,21 @@ const App: React.FC = () => {
     return () => { 
         if (authSubscription) authSubscription.unsubscribe(); 
         if (presenceChannel) supabase?.removeChannel(presenceChannel);
+        if (eventsChannel) supabase?.removeChannel(eventsChannel);
         window.removeEventListener('popstate', handleRouting); 
     };
   }, []);
 
+  const handlePurchase = useCallback((pageUrl: string) => {
+      if (isSupabaseConfigured() && supabase) {
+          const channel = supabase.channel('page_events');
+          channel.send({
+              type: 'broadcast',
+              event: 'purchase',
+              payload: { userId: userIdRef.current, pageUrl }
+          });
+      }
+  }, []);
 
   const formatSlug = (text: string) => { return text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-'); };
 
@@ -784,7 +827,7 @@ const App: React.FC = () => {
         <div className="relative">
             <div className="fixed top-3 left-3 z-[100] md:left-3 left-auto right-3 md:right-auto"><button onClick={() => { setView('home'); window.history.pushState({}, '', window.location.pathname); }} className="hidden md:flex bg-white/80 backdrop-blur-md text-slate-800 p-2 md:px-4 md:py-2 rounded-full shadow-sm border border-slate-200/50 hover:bg-white hover:shadow-md transition-all items-center gap-2 group" title="Torna allo Shop"><ChevronLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" /> <span className="hidden md:inline font-bold text-sm">Torna allo Shop</span></button></div>
             {session && (<div className="fixed top-3 right-3 z-[100]"><button onClick={() => setView('admin')} className="bg-emerald-600/90 backdrop-blur text-white p-2 md:px-4 md:py-2 rounded-full shadow-lg hover:bg-emerald-600 transition flex items-center gap-2 font-bold" title="Dashboard Admin"><LayoutDashboard className="w-5 h-5" /> <span className="hidden md:inline">Dashboard Admin</span></button></div>)}
-            <LandingPage content={contentWithScripts} thankYouSlug={selectedPublicPage.thank_you_slug} />
+            <LandingPage content={contentWithScripts} thankYouSlug={selectedPublicPage.thank_you_slug} onPurchase={handlePurchase} />
         </div>
       );
   }

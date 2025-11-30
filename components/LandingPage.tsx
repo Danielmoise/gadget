@@ -12,6 +12,7 @@ interface LandingPageProps {
   content: GeneratedContent;
   thankYouSlug?: string; // Optional: if present, enables redirect logic
   onRedirect?: (data?: OrderData) => void; // Optional: handles redirect in preview mode without reload
+  onPurchase?: (pageUrl: string) => void; // For live tracking
 }
 
 interface TemplateProps {
@@ -432,7 +433,7 @@ const DEFAULT_LABELS = {
 };
 
 // --- ORDER POPUP MODAL ---
-const OrderPopup: React.FC<{ isOpen: boolean; onClose: () => void; content: GeneratedContent; thankYouSlug?: string; onRedirect?: (data?: OrderData) => void }> = ({ isOpen, onClose, content, thankYouSlug, onRedirect }) => {
+const OrderPopup: React.FC<{ isOpen: boolean; onClose: () => void; content: GeneratedContent; thankYouSlug?: string; onRedirect?: (data?: OrderData) => void; onPurchase?: (pageUrl: string) => void; }> = ({ isOpen, onClose, content, thankYouSlug, onRedirect, onPurchase }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<'cod' | 'card'>('cod');
     const [formData, setFormData] = useState<Record<string, string>>({});
@@ -515,6 +516,10 @@ const OrderPopup: React.FC<{ isOpen: boolean; onClose: () => void; content: Gene
 
     const finalizeOrder = (method: 'cod' | 'card') => {
         setIsLoading(true);
+
+        if (onPurchase) {
+            onPurchase(window.location.pathname + window.location.search);
+        }
         
         const totalPrice = calculateTotal();
         const payloadData: Record<string, any> = {
@@ -1157,7 +1162,7 @@ const GadgetTemplate: React.FC<TemplateProps> = ({ content, onBuy, styles }) => 
     );
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ content, thankYouSlug, onRedirect }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ content, thankYouSlug, onRedirect, onPurchase }) => {
     const [isOrderOpen, setIsOrderOpen] = useState(false);
     const styles = getTypographyStyles(content.typography);
 
@@ -1176,7 +1181,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ content, thankYouSlug, onRedi
     return (
         <>
             <GadgetTemplate content={content} onBuy={handleOpenOrder} styles={styles} />
-            <OrderPopup isOpen={isOrderOpen} onClose={() => setIsOrderOpen(false)} content={content} thankYouSlug={thankYouSlug} onRedirect={onRedirect} />
+            <OrderPopup isOpen={isOrderOpen} onClose={() => setIsOrderOpen(false)} content={content} thankYouSlug={thankYouSlug} onRedirect={onRedirect} onPurchase={onPurchase} />
         </>
     );
 };
